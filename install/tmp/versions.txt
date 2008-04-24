@@ -1,0 +1,126 @@
+version 122, created on Thu May 25 20:52:27 GMT 2006
+
+FAQ.txt:
+
+INSTALL:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+MANIFEST:
+
+README.otl:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+bitmaps/TVO/1.bmp:
+
+bitmaps/TVO/1.xpm:
+
+bitmaps/TVO/2.bmp:
+
+bitmaps/TVO/2.xpm:
+
+bitmaps/TVO/3.bmp:
+
+bitmaps/TVO/3.xpm:
+
+bitmaps/TVO/4.bmp:
+
+bitmaps/TVO/4.xpm:
+
+bitmaps/TVO/5.bmp:
+
+bitmaps/TVO/5.xpm:
+
+bitmaps/TVO/6.bmp:
+
+bitmaps/TVO/6.xpm:
+
+bitmaps/TVO/7.bmp:
+
+bitmaps/TVO/7.xpm:
+
+bitmaps/TVO/all.bmp:
+
+bitmaps/TVO/all.xpm:
+
+bitmaps/TVO/bodytext.bmp:
+
+bitmaps/TVO/bodytext.xpm:
+
+bitmaps/TVO/down.bmp:
+
+bitmaps/TVO/down.xpm:
+
+bitmaps/TVO/firstline.bmp:
+
+bitmaps/TVO/firstline.xpm:
+
+bitmaps/TVO/left.bmp:
+
+bitmaps/TVO/left.xpm:
+
+bitmaps/TVO/minus.bmp:
+
+bitmaps/TVO/minus.xpm:
+
+bitmaps/TVO/plus.bmp:
+
+bitmaps/TVO/plus.xpm:
+
+bitmaps/TVO/right.bmp:
+
+bitmaps/TVO/right.xpm:
+
+bitmaps/TVO/up.bmp:
+
+bitmaps/TVO/up.xpm:
+
+changes.txt:
+
+doc/otl.txt:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+doc2otl:
+
+easy.gvimrc:
+
+easy.vimrc:
+
+ftdetect/otl.vim:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+ftplugin/otl.vim:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+install-tvo.bat:
+
+makezip:
+
+opml2otl:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+otl2html:
+
+otl2htmlList:
+
+otl2pod:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+otl2rtf:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+otl2swiki:
+
+otl2trac:
+
+otlParser.rb:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+pod2otl:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+syntax/otl.vim:
+     $Id: versions.txt,v 1.1 2007/12/26 03:43:02 nkrimm Exp $
+
+tvo.bat:
+
+macros/vimsettings.vim:

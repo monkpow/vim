@@ -1,0 +1,6 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = true
+[remotes "origin"]
+	url = http://pub.krimm.net/git/vim/

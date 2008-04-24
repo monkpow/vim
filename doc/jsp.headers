@@ -1,0 +1,9 @@
+<%@include file="inc/head.inc" %>
+<%@ page import="java.io.File,
+<%@ page session="false" contentType="text/html;charset=utf-8" %>
+<%@ tag body-content="scriptless" %>
+<%@ tag isELIgnored ="false" %>     
+<%@ taglib prefix="tiles" uri="http://struts.apache.org/tags-tiles"
+<%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
+<%@ taglib uri="http://myfaces.apache.org/tomahawk" prefix="t" %>
+<%@include file="inc/head.inc"%>

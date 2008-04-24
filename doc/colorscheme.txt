@@ -1,0 +1,30 @@
+*colors*
+    
+    bold
+    rt CVS_RSH=ssh
+		underline
+		reverse
+		inverse		same as reverse
+		italic
+		standout
+		NONE		no attributes used (used to reset it)
+
+
+
+Black
+DarkBlue
+DarkGreen
+DarkCyan
+DarkRed
+DarkMagenta
+DarkYellow
+LightGray, LightGrey, Gray, Grey
+DarkGray, DarkGrey
+Blue, LightBlue
+Green, LightGreen
+Cyan, LightCyan
+Red, LightRed
+Magenta, LightMagenta
+Yellow, LightYellow
+White
+
