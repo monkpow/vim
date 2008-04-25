@@ -9,7 +9,7 @@ set complete+=k
 set dictionary+=~/.vim/templates/code.complete
 set iskeyword+=:
 set wmh=0 "minimum window hieght
-set history=1000
+set history=500
 "set cursorline
 set hlsearch
 set foldmethod=indent
@@ -42,6 +42,9 @@ autocmd FileType xml         set omnifunc=xmlcomplete#CompleteTags
 autocmd FileType php         set omnifunc=phpcomplete#CompletePHP
 autocmd FileType c           set omnifunc=ccomplete#Complete
 autocmd FileType ruby,eruby,yaml set ai sw=2 sts=2 et
+autocmd FileType javascript nmap <F8> :mkview!maggVG!~/.vim/scripts/jsTidy.rb  :w :loadview
+autocmd FileType ruby,eruby,yaml nmap <F8> :mkview!maggVG%!ruby-code-indenter:loadview
+
 autocmd BufRead,BufNewFile *.py set filetype=python smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
 autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
@@ -77,8 +80,9 @@ nmap <F4> 100-
 nmap <F5> <F2><F3>
 nmap <F6> :set number!
 nmap <F7> ,c gv
-nmap <F8> :mkview!maggVG!~/.vim/scripts/jsTidy.rb  :w :loadview
-nmap <F7> :%!ruby-code-indenter<cr> 
+
+"nmap <F8> :mkview!maggVG!~/.vim/scripts/jsTidy.rb  :w :loadview
+"nmap <F7> :%!ruby-code-indenter<cr> 
 "nmap <space> zA
 	
 colorscheme nik
