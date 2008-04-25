@@ -49,7 +49,7 @@ hi WildMenu	cterm=bold	ctermfg=Black	ctermbg=Yellow
 "hi Menu	
 "hi Scrollbar	
 "hi Tooltip	
-
+"hi CursorLine  cterm=bold  ctermbg=lightgray
 " syntax highlighting groups
 hi Comment			ctermfg=gray
 

@@ -10,7 +10,7 @@ set dictionary+=~/.vim/templates/code.complete
 set iskeyword+=:
 set wmh=0 "minimum window hieght
 set history=1000
-set cursorline
+"set cursorline
 set hlsearch
 set foldmethod=indent
 set sw=2 ts=2 sts=2
@@ -41,10 +41,15 @@ autocmd FileType css         set omnifunc=csscomplete#CompleteCSS
 autocmd FileType xml         set omnifunc=xmlcomplete#CompleteTags
 autocmd FileType php         set omnifunc=phpcomplete#CompletePHP
 autocmd FileType c           set omnifunc=ccomplete#Complete
+autocmd FileType ruby,eruby,yaml set ai sw=2 sts=2 et
+autocmd BufRead,BufNewFile *.py set filetype=python smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
+autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
+autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
 augroup END
 
 " http://www.vex.net/~x/python_and_vim.html
-autocmd BufRead,BufNewFile *.py set filetype=python smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 
 "show tabs, spaces, end of lines
 "set list
@@ -72,14 +77,16 @@ nmap <F4> 100-
 nmap <F5> <F2><F3>
 nmap <F6> :set number!
 nmap <F7> ,c gv
-vmap <F7> ,c gv
 nmap <F8> :mkview!maggVG!~/.vim/scripts/jsTidy.rb  :w :loadview
+nmap <F7> :%!ruby-code-indenter<cr> 
 "nmap <space> zA
-imap <F8> ggVG!~/.vim/scripts/jsTidy.rb ^M :w a
 	
 colorscheme nik
-highlight CursorLine ctermbg=white cterm=reverse
+"highlight CursorLine ctermbg=white cterm=reverse
 set grepprg=grep\ -nH\ $*  " experimental, from brians .vimrc
 
 
- 
+silent! ruby nil 
+nmap <leader>rci :%!ruby-code-indenter<cr> 
+
+

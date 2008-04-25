@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:             Ruby
 " Maintainer:           Mark Guzman <segfault@hasno.info>
-" Info:                 $Id: rubycomplete.vim,v 1.1 2007/04/12 04:29:23 nkrimm Exp $
+" Info:                 $Id: rubycomplete.vim,v 1.39 2006/12/13 21:20:47 segy Exp $
 " URL:                  http://vim-ruby.rubyforge.org
 " Anon CVS:             See above site
 " Release Coordinator:  Doug Kearns <dougkearns@gmail.com>
