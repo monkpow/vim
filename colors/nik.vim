@@ -15,7 +15,7 @@ hi Normal			ctermfg=darkgray	ctermbg=white
 
 "hi Cursor											
 "hi CursorIM			NONE								
-hi Directory			ctermfg=White					
+hi Directory			ctermfg=black
 
 
 
