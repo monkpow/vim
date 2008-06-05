@@ -93,4 +93,5 @@ set grepprg=grep\ -nH\ $*  " experimental, from brians .vimrc
 silent! ruby nil 
 nmap <leader>rci :%!ruby-code-indenter<cr> 
 
+nmap <leader>x :!java -cp /usr/local/rhino/js.jar:/usr/local/rhino/jline-0.9.94.jar org.mozilla.javascript.tools.shell.Main -version 170 % 
 
