@@ -1,0 +1,170 @@
+let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+argglobal
+let s:cpo_save=&cpo
+set cpo&vim
+nmap <buffer> gf <Plug>RailsTabFind
+nmap <buffer> f <Plug>RailsSplitFind
+nmap <buffer> [f <Plug>RailsAlternate
+nmap <buffer> ]f <Plug>RailsRelated
+nmap <buffer> gf <Plug>RailsFind
+map <buffer> <silent> <Plug>RailsTabFind :RTfind
+map <buffer> <silent> <Plug>RailsVSplitFind :RVfind
+map <buffer> <silent> <Plug>RailsSplitFind :RSfind
+map <buffer> <silent> <Plug>RailsFind :REfind
+map <buffer> <silent> <Plug>RailsRelated :R
+map <buffer> <silent> <Plug>RailsAlternate :A
+let &cpo=s:cpo_save
+unlet s:cpo_save
+setlocal autoindent
+setlocal autoread
+setlocal nobinary
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal cindent
+setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
+setlocal commentstring=//%s
+setlocal complete=.,w,b,u,t,i,k
+setlocal completefunc=syntaxcomplete#Complete
+setlocal nocopyindent
+setlocal nocursorcolumn
+setlocal nocursorline
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal expandtab
+if &filetype != 'javascript'
+setlocal filetype=javascript
+endif
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+setlocal foldlevel=3
+setlocal foldmarker={{{,}}}
+setlocal foldmethod=indent
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=croql
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=0
+setlocal include=
+setlocal includeexpr=RailsIncludeexpr()
+setlocal indentexpr=GetJSIndent()
+setlocal indentkeys=0{,0},:,0#,!^F,o,O,e,},=\\item,=\\bibitem,=nikkrimm
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255,:,$
+setlocal keywordprg=
+setlocal nolinebreak
+setlocal nolisp
+setlocal nolist
+setlocal makeprg=rake
+setlocal matchpairs=(:),{:},[:]
+setlocal modeline
+setlocal modifiable
+setlocal nrformats=octal,hex
+setlocal nonumber
+setlocal numberwidth=4
+setlocal omnifunc=javascriptcomplete#CompleteJS
+setlocal path=.,~/Sites/ValueMeal/trunk,~/Sites/ValueMeal/trunk/app/controllers,~/Sites/ValueMeal/trunk/app,~/Sites/ValueMeal/trunk/app/models,~/Sites/ValueMeal/trunk/app/helpers,~/Sites/ValueMeal/trunk/config,~/Sites/ValueMeal/trunk/lib,~/Sites/ValueMeal/trunk/vendor,~/Sites/ValueMeal/trunk/vendor/plugins/*/lib,~/Sites/ValueMeal/trunk/test/unit,~/Sites/ValueMeal/trunk/test/functional,~/Sites/ValueMeal/trunk/test/integration,~/Sites/ValueMeal/trunk/app/apis,~/Sites/ValueMeal/trunk/app/services,~/Sites/ValueMeal/trunk/test,/vendor/plugins/*/test,~/Sites/ValueMeal/trunk/vendor/rails/*/lib,~/Sites/ValueMeal/trunk/vendor/rails/*/test,~/Sites/ValueMeal/trunk/spec,~/Sites/ValueMeal/trunk/spec/*,~/Sites/ValueMeal/trunk,~/Sites/ValueMeal/trunk/app/controllers,~/Sites/ValueMeal/trunk/app,~/Sites/ValueMeal/trunk/app/models,~/Sites/ValueMeal/trunk/app/helpers,~/Sites/ValueMeal/trunk/config,~/Sites/ValueMeal/trunk/lib,~/Sites/ValueMeal/trunk/vendor,~/Sites/ValueMeal/trunk/vendor/plugins/*/lib,~/Sites/ValueMeal/trunk/test/unit,~/Sites
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal noscrollbind
+setlocal shiftwidth=2
+setlocal noshortname
+setlocal nosmartindent
+setlocal softtabstop=2
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal statusline=%<%f\ %h%m%r%{RailsStatusline()}%=
+setlocal suffixesadd=.rb,.rhtml,.erb,.rxml,.builder,.rjs,.mab,.liquid,.haml,.dryml,.css,.js,.yml,.csv,.rake,.sql,.html,.xml
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'javascript'
+setlocal syntax=javascript
+endif
+setlocal tabstop=2
+setlocal tags=./tags,tags,~/Sites/ValueMeal/trunk/tags,~/Sites/ValueMeal/trunk/.tags
+setlocal textwidth=0
+setlocal thesaurus=
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+2
+normal zo
+7
+normal zo
+9
+normal zo
+7
+normal zo
+2
+normal zo
+18
+normal zo
+22
+normal zo
+23
+normal zo
+27
+normal zo
+22
+normal zo
+18
+normal zo
+38
+normal zo
+43
+normal zo
+47
+normal zo
+78
+normal zo
+80
+normal zo
+82
+normal zo
+80
+normal zo
+78
+normal zo
+47
+normal zo
+43
+normal zo
+45
+normal zo
+76
+normal zo
+81
+normal zo
+76
+normal zo
+45
+normal zo
+38
+normal zo
+let s:l = 17 - ((16 * winheight(0) + 15) / 30)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+17
+normal! 0
+lcd ~/Sites/ValueMeal/trunk/vendor/plugins/acts_as_solr/solr/webapps
+let &so = s:so_save | let &siso = s:siso_save
+doautoall SessionLoadPost
+" vim: set ft=vim :
