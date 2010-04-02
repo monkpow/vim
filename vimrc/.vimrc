@@ -16,6 +16,8 @@ set list listchars=tab:>-,trail:. "show tabs, spaces, end of lines
 set showmatch
 set sw=2 ts=2 sts=2
 set wmh=0 "minimum window hieght
+"set foldminlines  5
+set foldlevel=1
 "plugin settings
 "supertab
 "let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
@@ -37,7 +39,7 @@ au! BufRead,BufNewFile *.erb                                         set filetyp
 au! BufRead,BufNewFile *.css                                         set filetype=css dictionary+=~/.vim/wordlists/css.list omnifunc=csscomplete#CompleteCSS
 au! BufRead,BufNewFile *.php                                         set filetype=htm
 au! BufRead,BufNewFile *.py                                          set filetype=python smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-au! BufRead,BufNewFile,BufEnter *.html                                        set filetype=html
+au! BufRead,BufNewFile *.html                                        set filetype=html
 
 au! FileType html                                                    set foldmethod=indent foldlevel=1
 autocmd FileType css                                                 set omnifunc=csscomplete#CompleteCSS
@@ -50,6 +52,7 @@ autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
 autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
 autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
 autocmd Filetype ruby,eruby                                          set cinoptions=:0,p0,t0 cinwords=if,else,while,do,for,switch,case
+autocmd Filetype ruby,eruby set foldmethod=indent foldlevel=1
 
 augroup END
 
@@ -80,15 +83,19 @@ nmap ,b :HSBufExplorer
 nmap ,d :NERDTreeToggle
 
 " cleanup whitespace at end of line
-:nnoremap <silent> <F7> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
+:nnoremap <silent> <F7> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
 
 colorscheme inkpot
-colo fruidle 
+"colo aiseered_edit
+"colo nik_trans
+" make autocomplete menu a reasonable color
+highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
+
+"colo fruidle 
 " color the popup menu
-"color 256_redblack
 "highlight Pmenu ctermbg=olive cterm=none ctermfg=red
 "highlight PmenuSel ctermbg=gray cterm=bold ctermfg=red
-"set grepprg=grep\ -nH\ $*  " experimental, from brians .vimrc
+set grepprg=grep\ -nH\ $*  " experimental, from brians .vimrc
 
 
 silent! ruby nil

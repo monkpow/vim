@@ -1,8 +1,8 @@
 " NOTE: this is not the original file! converted for use with xterm-256
-set background=light
+set background=dark
 hi clear
 
-hi Normal          ctermfg=153	
+hi Normal          ctermbg=0	  ctermfg=250	
 hi Boolean         ctermbg=0	  ctermfg=250	
 hi Character       ctermbg=0	  ctermfg=9	
 hi Comment         ctermbg=0	  ctermfg=59	 
@@ -40,7 +40,7 @@ hi PreCondit       ctermbg=0	  ctermfg=15
 hi PreProc         ctermbg=0	  ctermfg=15	
 hi Question        ctermbg=0	  ctermfg=250	
 hi Repeat          ctermbg=0	  ctermfg=15	
-hi Search          ctermbg=100	  ctermfg=14	
+hi Search          ctermbg=0	  ctermfg=14	
 hi SpecialChar     ctermbg=0	  ctermfg=15	
 hi SpecialComment  ctermbg=0	  ctermfg=15	
 hi Special         ctermbg=0	  ctermfg=15	
