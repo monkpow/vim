@@ -1,86 +1,83 @@
 " Vim indent file
-" Language:     JavaScript
-" Maintainer:   Nik Krimm <nkrimm@gmail.com>
-" Created:      12/28/2006
-" Last Change:	12/28/2006
-" Version: 0.2
-" URL: comming soon
+" Language: JavaScript
+" Author: Ryan (ryanthe) Fabella <ryanthe at gmail dot com>
+" URL:    -
+" Last Change:  2007 september 25
 
-" Version .02
-" capture case: { } on same line (same indenting)
-" Skeleton liberally borrowed from tex script written by tex indent script
-" written by ?? 
+if exists('b:did_indent')
+  finish
+endif
+let b:did_indent = 1
 
-" todo
-" indent [\n correctly
-" abstract patterns
+setlocal indentexpr=GetJsIndent()
+setlocal indentkeys=0{,0},0),:,!^F,o,O,e,*<Return>,=*/
+" Clean CR when the file is in Unix format
+if &fileformat == "unix"
+    silent! %s/\r$//g
+endif
+" Only define the functions once per Vim session.
+if exists("*GetJsIndent")
+    finish
+endif
+function! GetJsIndent()
+    let pnum = prevnonblank(v:lnum - 1)
+    if pnum == 0
+       return 0
+    endif
+    let line = getline(v:lnum)
+    let pline = getline(pnum)
+    let ind = indent(pnum)
 
-setlocal indentexpr=GetJSIndent()
-setlocal nolisp
-setlocal nosmartindent
-setlocal autoindent
-setlocal indentkeys+=},=\\item,=\\bibitem,=nikkrimm
+    if pline =~ '{\s*$\|[\s*$\|(\s*$'
+  let ind = ind + &sw
+    endif
 
+    if pline =~ ';\s*$' && line =~ '^\s*}'
+        let ind = ind - &sw
+    endif
 
-" Only define the function once
-"if exists("*GetJSIndent") | finish
-"endif
+    if pline =~ '\s*]\s*$' && line =~ '^\s*),\s*$'
+      let ind = ind - &sw
+    endif
 
+    if pline =~ '\s*]\s*$' && line =~ '^\s*}\s*$'
+      let ind = ind - &sw
+    endif
 
+    if line =~ '^\s*});\s*$\|^\s*);\s*$' && pline !~ ';\s*$'
+      let ind = ind - &sw
+    endif
 
-function! GetJSIndent()
+    if line =~ '^\s*})' && pline =~ '\s*,\s*$'
+      let ind = ind - &sw
+    endif
 
-  " Find a non-blank line above the current line.
-  let lnum = prevnonblank(v:lnum - 1)
+    if line =~ '^\s*}();\s*$' && pline =~ '^\s*}\s*$'
+      let ind = ind - &sw
+    endif
 
-  " At the start of the file use zero indent.
-  if lnum == 0 | return 0 
-  endif
+    if line =~ '^\s*}),\s*$'
+      let ind = ind - &sw
+    endif
 
-  let ind = indent(lnum)
-  let line = getline(lnum)             " last line
-  let cline = getline(v:lnum)          " current line
+    if pline =~ '^\s*}\s*$' && line =~ '),\s*$'
+       let ind = ind - &sw
+    endif
 
-  " Do not change indentation of commented lines.
-  "if line =~ '^\s*\/'
-  "  return ind
-  " endif
+    if pline =~ '^\s*for\s*' && line =~ ')\s*$'
+       let ind = ind + &sw
+    endif
 
-  " adding shiftwidth
+    if line =~ '^\s*}\s*$\|^\s*]\s*$\|\s*},\|\s*]);\s*\|\s*}]\s*$\|\s*};\s*$\|\s*})$\|\s*}).el$' && pline !~ '\s*;\s*$\|\s*]\s*$' && line !~ '^\s*{' && line !~ '\s*{\s*}\s*'
+          let ind = ind - &sw
+    endif
 
-  "if line =~ '^\s*)\s*{\([^}]*\)}\s*$'  " ) { return -1 } 
-    ""let ind = ind + &sw 
-    ""return ind 
-  "endif
+    if pline =~ '^\s*/\*'
+      let ind = ind + 1
+    endif
 
-
-  if line =~ '{\s*$' || line =~ '{\s*\/' " beginning of block statements.
-    let ind = ind + &sw
-  elseif line =~ '([^)]*$'             " an open paren ends a line.
-    let ind = ind + &sw
-  elseif line =~ '{' && line =~ '}'    " capture {/* same line */}
-    let ind = ind + &sw
-  elseif line =~ '[\s*$'               " capture case where an array is set on separate lines
-    let ind = ind + &sw
-  endif
-
-
-  " removing shiftwith
-  if cline =~ '^\s*)'              " a closed paren starts a line.
-    let ind = ind - &sw
-    "elseif cline =~ '{' && cline =~ '}' 
-    "  let ind = ind - &sw
-  elseif cline =~ '}' " Subtract a 'shiftwidth' when a block statement ends
-    let ind = ind - &sw
-  elseif line =~ '(){}'  " like:  ) { return -1 } 
-    let ind = ind - &sw 
-  elseif line =~ '^\s*)\s*{\([^}]*\)}\s*$'  " like:  ) { return -1 } 
-    let ind = ind - &sw 
-  elseif cline=~ ']\s*$'                " unindent at end of array
-    let ind = ind - &sw
-  endif
-
-  return ind
-
+    if pline =~ '\*/$'
+      let ind = ind - 1
+    endif
+    return ind
 endfunction
-

@@ -1,0 +1,193 @@
+*ruby-command_line*
+
+
+It's an unfortunate fact of life that our applications have to deal with the big, bad world. In this chapter, we'll look at how Ruby interacts with its environment. Microsoft Windows users will probably also want to look at platform-specific information beginning on page 163.
+Command-Line Arguments
+
+``In the Beginning was the Command Line.''[Title of a marvelous essay by Neal Stephenson (available online at http://www.spack.org/essays/commandline.html).] Regardless of the system in which Ruby is deployed, whether it be a super high-end scientific graphics workstation or an embedded PDA device, you've got to start the Ruby interpreter somehow, and that gives us the opportunity to pass in command-line arguments.
+
+A Ruby command line consists of three parts: options to the Ruby interpreter, optionally the name of a program to run, and optionally a set of arguments for that program.
+
+ruby [
+            options
+            ] [--] [
+            programfile
+            ] [
+            arguments
+            ]
+
+The Ruby options are terminated by the first word on the command line that doesn't start with a hyphen, or by the special flag ``--'' (two hyphens).
+
+If no filename is present on the command line, or if the filename is a single hyphen (-), Ruby reads the program source from standard input.
+
+Arguments for the program itself follow the program name. For example:
+
+% ruby -w - "Hello World"
+
+will enable warnings, read a program from standard input, and pass it the quoted string "Hello World" as an argument.
+Command-Line Options
+
+-0[octal}
+' The number ``0'' flag specifies the record separator character (\0, if no digit follows). -00 indicates paragraph mode: records are separated by two successive default record separator characters. -0777 reads the entire file at once (as it is an illegal character). Sets $/.
+
+-a
+' Auto split mode when used with -n or -p; equivalent to executing {$F at the top of each loop iteration.
+
+-C directory
+' Changes working directory to directory before executing.
+
+-c
+' Checks syntax only; does not execute the program.
+
+--copyright
+Prints the copyright notice and exits.
+
+-d, --debug
+' Sets $DEBUG to true. This can be used by your programs to enable additional tracing.
+
+-e 'command'
+' Executes command as one line of Ruby source. Several -e's are allowed, and the commands are treated as multiple lines in the same program. If programfile is omitted when -e is present, execution stops after the -e commands have been run.
+
+-F pattern
+' Specifies the input field separator ($;) used as the default for split() (affects -a).
+
+-h, --help
+' Displays a short help screen.
+
+-I directories
+' Specifies directories to be prepended to $LOAD_PATH ($:). Multiple -I options may be present, and multiple directories may appear following each -I. Directories are separated by a ``:'' on Unix-like systems and by a ``;'' on DOS/Windows systems.
+
+-i [extension}
+' Edits ARGV files in place. For each file named in ARGV, anything you write to standard output will be saved back as the contents of that file. A backup copy of the file will be made if extension is supplied.
+
+% ruby -pi.bak -e "gsub(/Perl/, 'Ruby')" *.txt
+
+-K kcode
+' Specifies the code set to be used. This option is useful mainly when Ruby is used for Japanese-language processing. kcode may be one of: e, E for EUC; s, S for SJIS; u, U for UTF-8; or a, A, n, N for ASCII.
+
+-l
+' Enables automatic line-ending processing; sets $\ to the value of $/ and chops every input line automatically.
+
+-n
+' Assumes ``while gets; ...; end'' loop around your program. For example, a simple grep command might be implemented as:
+
+% ruby -n -e "print if /wombat/"  *.txt
+
+-p
+' Places your program code within the loop ``while gets; ...; print; end.''
+
+% ruby -p -e "$_.downcase!" *.txt
+
+-r library
+' requires the named library before executing.
+
+-S
+' Looks for the program file using RUBYPATH or PATH environment variable.
+
+-s
+' Any command line switches found after the program filename, but before any filename arguments or before a --, are removed from ARGV and set to a global variable named for the switch. In the following example, the effect of this would be to set the variable $opt to ``electric''.
+
+% ruby -s prog -opt=electric ./mydata
+
+-T[level}
+' Sets the safe level, which among other things enables tainting checks (see page 253). Sets $SAFE.
+
+-v, --verbose
+' Enables verbose mode and print the version number. In verbose mode, compilation warnings are printed. If no program filename appears on the command line, Ruby exits.
+
+--version
+Displays the Ruby version number and exits.
+
+-w
+' Enables verbose mode. Unlike -v, reads program from standard input if no program files are present on the command line. We recommend running your Ruby programs with -w.
+
+-X directory
+' Changes working directory to directory before executing. Same as -C directory.
+
+-x [directory}
+' Strips off text before #!ruby line and changes working directory to directory if given.
+
+-y, --yydebug
+' Enables yacc debugging in the parser (waaay too much information).
+
+ARGV
+
+Any command-line arguments after the program filename are available to your Ruby program in the global array ARGV. For instance, invoking Ruby as
+
+% ruby -w ptest "Hello World" a1 1.6180
+
+yields an ARGV array containing ["Hello World", a1, 1.6180]. There's a gotcha here for all you C programmers---ARGV[0] is the first argument to the program, not the program name. The name of the current program is available in the global variable $0.
+Program Termination
+
+The method Kernel#exit terminates your program, returning a status value to the operating system. However, unlike some languages, exit doesn't just terminate the program immediately. Kernel#exit first raises a SystemExit exception, which you may catch, and then performs a number of cleanup actions, including running any registered at_exit methods and object finalizers. See the reference for Kernel#exit beginning on page 415 for details.
+Environment Variables
+
+You can access operating system environment variables using the predefined variable ENV. It responds to the same methods as Hash.[ENV is not actually a hash, but if you need to, you can convert it into a Hash using ENV#to_hash.]
+
+The values of some environment variables are read by Ruby when it first starts. These variables modify the behavior of the interpreter, as shown in Table 13.1 on page 139.
+Environment variables used by Ruby
+Variable Name   Description
+RUBYOPT   Additional command-line options to Ruby; examined after real command-line options are parsed ($SAFE must be 0).
+RUBYLIB   Additional search path for Ruby programs ($SAFE must be 0).
+RUBYPATH  With -S option, search path for Ruby programs (defaults to PATH).
+RUBYSHELL   Shell to use when spawning a process; if not set, will also check SHELL or COMSPEC.
+DLN_LIBRARY_PATH  Search path for dynamically loaded modules.
+RUBYLIB_PREFIX  (Windows only) Mangle the RUBYLIB search path by adding this prefix to each component.
+
+Writing to Environment Variables
+
+A Ruby program may write to the ENV object, which on most systems changes the values of the corresponding environment variables. However, this change is local to the process that makes it and to any subsequently spawned child processes. This inheritance of environment variables is illustrated in the code that follows. A subprocess changes an environment variable and this change is seen in a process that it then starts. However, the change is not visible to the original parent. (This just goes to prove that parents never really know what their children are doing.)
+
+puts "In parent, term = #{ENV['TERM']}"
+fork do
+  puts "Start of child 1, term = #{ENV['TERM']}"
+  ENV['TERM'] = "ansi"
+  fork do
+    puts "Start of child 2, term = #{ENV['TERM']}"
+  end
+  Process.wait
+  puts "End of child 1, term = #{ENV['TERM']}"
+end
+Process.wait
+puts "Back in parent, term = #{ENV['TERM']}"
+
+produces:
+
+In parent, term = xterm
+Start of child 1, term = xterm
+Start of child 2, term = ansi
+End of child 1, term = ansi
+Back in parent, term = xterm
+
+Where Ruby Finds Its Modules
+
+You use require or load to bring a library module into your Ruby program. Some of these modules are supplied with Ruby, some you installed off the Ruby Application Archive, and some you wrote yourself. How does Ruby find them?
+
+When Ruby is built for your particular machine, it predefines a set of standard directories to hold library stuff. Where these are depends on the machine in question. You can determine this from the command line with something like:
+
+% ruby -e 'puts $:'
+
+On a typical Linux box, you'll probably find something such as:
+
+/usr/local/lib/ruby/site_ruby/1.6/i686-linux
+/usr/local/lib/ruby/site_ruby/1.6
+/usr/local/lib/ruby/site_ruby
+/usr/local/lib/ruby/1.6/i686-linux
+/usr/local/lib/ruby/1.6
+.
+
+The site_ruby directories are intended to hold modules and extensions that you've added. The architecture-dependent directories (i686-linux in this case) hold executables and other things specific to this particular machine. All these directories are automatically included in Ruby's search for modules.
+
+Sometimes this isn't enough. Perhaps you're working on a large project written in Ruby, and you and your colleagues have built a substantial library of Ruby code. You want everyone on the team to have access to all of this code. You have a couple of options to accomplish this. If your program runs at a safe level of zero (see Chapter 20 beginning on page 253), you can set the environment variable RUBYLIB to a list of one or more directories to be searched.[The separator between entries depends on your platform. For Windows, it's a semicolon; for Unix, a colon.] If your program is not setuid, you can use the command-line parameter -I to do the same thing.
+
+Finally, the Ruby variable $: is an array of places to search for loaded files. This variable is initialized to the list of standard directories, plus any additional ones you specified using RUBYLIB and -I. You can always add additional directories to this array from within your running program.
+Build Environment
+
+When Ruby is compiled for a particular architecture, all of the relevant settings used to build it (including the architecture of the machine on which it was compiled, compiler options, source code directory, and so on) are written to the module Config within the library file ``rbconfig.rb''. After installation, any Ruby program can use this module to get details on how Ruby was compiled.
+
+require "rbconfig.rb"
+include Config
+CONFIG["host"]  »   "i686-pc-linux"
+CONFIG["LDFLAGS"]   »   "-rdynamic"
+
+Extension libraries use this configuration file in order to compile and link properly on any given architecture. See Chapter 17 beginning on page 169, and the reference for mkmf beginning on page 451 for details.

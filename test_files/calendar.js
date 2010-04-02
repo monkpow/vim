@@ -1,5 +1,5 @@
 try{
-	window.onload=initShippingCalendar
+  window.onload=initShippingCalendar
 }catch(e){
 	put(e)
 }

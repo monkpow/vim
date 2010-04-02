@@ -1,13 +1,8 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="test.xsl"?>
-<!-- this is a test document -->
-<document>
-   <!-- test comment -->
-   <x name="x">x</x>
-   <y name="y">y</y>
-   <z name="z">z</z>
+<project name="presentation" default="test" basedir=".">
 
-   <abc>
-      <def>def</def>
-   </abc>
-</document>
+<target name="test" >
+<echo>working</echo>
+</target>
+
+</project>
+

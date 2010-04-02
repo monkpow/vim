@@ -12,6 +12,8 @@
 " ----------------------------------------------------------------------------
 
 " Only do this when not done yet for this buffer
+set dictionary+=~/.vim/dictionarys/ruby.vim
+
 if (exists("b:did_ftplugin"))
   finish
 endif

@@ -1,0 +1,26 @@
+*assertions*
+  assert: function(expression) {
+  assertEqual: function(expected, actual) {
+  assertInspect: function(expected, actual) {
+  assertEnumEqual: function(expected, actual) {
+  assertNotEqual: function(expected, actual) {
+  assertIdentical: function(expected, actual) { 
+  assertNotIdentical: function(expected, actual) { 
+  assertNull: function(obj) {
+  assertMatch: function(expected, actual) {
+  assertHidden: function(element) {
+  assertNotNull: function(object) {
+  assertType: function(expected, actual) {
+  assertNotOfType: function(expected, actual) {
+  assertInstanceOf: function(expected, actual) {
+  assertNotInstanceOf: function(expected, actual) {
+  assertRespondsTo: function(method, obj) {
+  assertReturnsTrue: function(method, obj) {
+  assertReturnsFalse: function(method, obj) {
+  assertRaise: function(exceptionName, method) {
+  assertElementsMatch: function() {
+  assertElementMatches: function(element, expression) {
+  benchmark: function(operation, iterations) {
+  assertNotVisible: function(element) {
+  assertVisible: function(element) {
+  benchmark: function(operation, iterations) {

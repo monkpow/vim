@@ -1,0 +1,79 @@
+Throw out your Perl: One-line aggregation in awk
+
+I ran into a student from a class I taught last summer. He?s a really sharp guy, and when I first met him, I was impressed with just how much Perl he could stuff into his brain?s cache. He would write what he called ?one-liners? in Perl that, in reality, took up 5-10 lines in his terminal. Still, he?d type furiously, without skipping a beat. But he told me when we met that he no longer does this, because I covered awk in my class.
+
+His one-liners were mostly for data munging. The data he needed to munge was mostly data that was pretty predictable. It had a fixed number of fields, a consistent delimiter ? in short, it was perfect for munging in awk without using any kind of esoteric awk-ness.
+
+One thing I cover in the learning module I?ve developed on Awk is aggregation of data using pretty simple awk one-liners. For example, here?s a pretty typical /etc/passwd file (we need some data to munge):
+
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+news:x:9:13:news:/etc/news:
+uucp:x:10:14:uucp:/var/spool/uucp:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+gopher:x:13:30:gopher:/var/gopher:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+apache:x:48:48:Apache:/var/www:/sbin/nologin
+avahi:x:70:70:Avahi daemon:/:/sbin/nologin
+mailnull:x:47:47::/var/spool/mqueue:/sbin/nologin
+smmsp:x:51:51::/var/spool/mqueue:/sbin/nologin
+distcache:x:94:94:Distcache:/:/sbin/nologin
+nscd:x:28:28:NSCD Daemon:/:/sbin/nologin
+vcsa:x:69:69:virtual console memory owner:/dev:/sbin/nologin
+rpc:x:32:32:Portmapper RPC user:/:/sbin/nologin
+rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/bash
+dovecot:x:97:97:dovecot:/usr/libexec/dovecot:/sbin/nologin
+squid:x:23:23::/var/spool/squid:/sbin/nologin
+ldap:x:55:55:LDAP User:/var/lib/ldap:/bin/false
+pcap:x:77:77::/var/arpwatch:/sbin/nologin
+ntp:x:38:38::/etc/ntp:/sbin/nologin
+rpm:x:37:37::/var/lib/rpm:/sbin/nologin
+haldaemon:x:68:68:HAL daemon:/:/sbin/nologin
+named:x:25:25:Named:/var/named:/sbin/nologin
+xfs:x:43:43:X Font Server:/etc/X11/fs:/sbin/nologin
+jonesy:x:500:500::/home/jonesy:/bin/bash
+
+It?s not exotic, cool data that we?re going to infer a lot of interesting things from, but it?ll do for pedagogical purposes.
+
+Now, let?s write a super-simple awk aggregation routine that?ll count the number of users whose UID is > 100. It?ll look something like this:
+
+awk -F: '$3 > 100 {x+=1} END {print x}' /etc/passwd
+
+The important thing to remember is that awk will initialize your variables to 0 for you, which cuts down on some clutter.
+
+Let?s abuse awk a bit further. What if wet multi-dimensional arrays, it also doesn?t have to be numericaone line containing /bin/bash up to the current record, then x[/bin/bash]=1
+
+There?s a lot of great things you can move onto from here. You can do things that others use Excel for right in awk. want to know how many users use each shell in /etc/passwd, whatever those shells may be? Here?s a one-liner that?ll take care of this for you:
+
+awk -F: '{x[$7]+=1} END {for(z in x) {print z, x[z]} }' /etc/passwd
+
+While awk doesn?t technically support multi-dimensio olly indexed. So here, we tell awk to increment x[$7]. $7 is the field that holds the shell for each user, so if $7 on the current line is /bin/bash, then we?ve told awk to increment the value in the array indexed at x[/bin/bash]. So, if there?s only one line containing /bin/bash up to the current record, then t in a file called ?stocks.txt?. The columns are stock symbol, number of shares, purchase price, and current price, in that order. This awk one-liner indexes the ?x? array using the stock symbol, and the value at that index is set to the amount gained or lost:
+
+awk -F, '{x[$1]=($2*$4)-($2*$3)} END {for(z in x) {print z, x[z]}}' stocks.txt
+
+Hm. Actually, that?s kind of inefficient. I realized while previewing this post that I can shorten it up a bit like this:
+
+awk -F, '{x[$1]=($2*($4 - $3))} END {for(z in x) {print z, x[z]}}' stocks.txt
+
+Glad I caught that before the nitpickers flamed me to a crisp. Always preview your posts! ;-P
+
+Ah, but of course, that?s not enough. This spits out the gain and loss for each stock, but what about the net gain or loss across all of them? You only need to tweak a little bit:
+
+awk -F, '{x[$1]=($2*($4-$3)); y+=x[$1]} END {for(z in x) {print z, x[z]}; print "Net: "y}' stocks.txt
+
+We just added the assignment of the ?y? variable before the ?END?, and then added a print statement after the ?END?.
+
+I hope this helps some folks out there. Also, if your team needs to know stuff like this, I do on-site training!
