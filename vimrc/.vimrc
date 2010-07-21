@@ -79,6 +79,8 @@ nmap <F3> :only
 nmap <F4> :ball
 nmap <F6> :set number!
 
+nmap ,a  i"test foo": function(){ with (this) { assert(false, 'no test written'); } }
+
 nmap ,b :HSBufExplorer
 nmap ,d :NERDTreeToggle
 
@@ -207,6 +209,8 @@ set dir=~/tmp
 
 " abbreviations
 abbr cedit :sp ~/.vim/colors/inkpot.vim
+abbr restart_apache !sudo /etc/init.d/httpd restart
+
 
 " put a erb delimiter
 abbr %% <%  %>hhhha
