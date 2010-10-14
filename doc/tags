@@ -18,6 +18,7 @@
 'NERDTreeStatusline'	NERD_tree.txt	/*'NERDTreeStatusline'*
 'NERDTreeWinPos'	NERD_tree.txt	/*'NERDTreeWinPos'*
 'NERDTreeWinSize'	NERD_tree.txt	/*'NERDTreeWinSize'*
+'TailMinusF_Height'	tailminusf.txt	/*'TailMinusF_Height'*
 'Tlist_Auto_Highlight_Tag'	taglist.txt	/*'Tlist_Auto_Highlight_Tag'*
 'Tlist_Auto_Open'	taglist.txt	/*'Tlist_Auto_Open'*
 'Tlist_Auto_Update'	taglist.txt	/*'Tlist_Auto_Update'*
@@ -54,6 +55,10 @@
 :ATrim	twitvim.txt	/*:ATrim*
 :ATweetburner	twitvim.txt	/*:ATweetburner*
 :AUrlBorg	twitvim.txt	/*:AUrlBorg*
+:Ack	ack.txt	/*:Ack*
+:AckAdd	ack.txt	/*:AckAdd*
+:AckFile	ack.txt	/*:AckFile*
+:AckFromSearch	ack.txt	/*:AckFromSearch*
 :BPosttoTwitter	twitvim.txt	/*:BPosttoTwitter*
 :BitLy	twitvim.txt	/*:BitLy*
 :CPosttoTwitter	twitvim.txt	/*:CPosttoTwitter*
@@ -79,6 +84,8 @@
 :FuzzyFinderTagWithCursorWord	fuzzyfinder.txt	/*:FuzzyFinderTagWithCursorWord*
 :FuzzyFinderTaggedFile	fuzzyfinder.txt	/*:FuzzyFinderTaggedFile*
 :IsGd	twitvim.txt	/*:IsGd*
+:LAck	ack.txt	/*:LAck*
+:LAckAdd	ack.txt	/*:LAckAdd*
 :LocationTwitter	twitvim.txt	/*:LocationTwitter*
 :Metamark	twitvim.txt	/*:Metamark*
 :NERDTree	NERD_tree.txt	/*:NERDTree*
@@ -103,6 +110,7 @@
 :SearchTwitter	twitvim.txt	/*:SearchTwitter*
 :SetIfUnset	HTML.txt	/*:SetIfUnset*
 :Snipurl	twitvim.txt	/*:Snipurl*
+:Tail	tailminusf.txt	/*:Tail*
 :TinyURL	twitvim.txt	/*:TinyURL*
 :TlistAddFiles	taglist.txt	/*:TlistAddFiles*
 :TlistAddFilesRecursive	taglist.txt	/*:TlistAddFilesRecursive*
@@ -251,6 +259,7 @@ NERD_commenter.txt	NERD_commenter.txt	/*NERD_commenter.txt*
 NERD_tree.txt	NERD_tree.txt	/*NERD_tree.txt*
 Number	prototype.txt	/*Number*
 SetIfUnset()	HTML.txt	/*SetIfUnset()*
+TailMinusF.txt	tailminusf.txt	/*TailMinusF.txt*
 Tlist_Get_Tag_Prototype_By_Line()	taglist.txt	/*Tlist_Get_Tag_Prototype_By_Line()*
 Tlist_Get_Tagname_By_Line()	taglist.txt	/*Tlist_Get_Tagname_By_Line()*
 Tlist_Set_App()	taglist.txt	/*Tlist_Set_App()*
@@ -292,6 +301,9 @@ TwitVim-timeline-commands	twitvim.txt	/*TwitVim-timeline-commands*
 TwitVim-tips	twitvim.txt	/*TwitVim-tips*
 TwitVim-update-commands	twitvim.txt	/*TwitVim-update-commands*
 TwitVim-utility	twitvim.txt	/*TwitVim-utility*
+ack	ack.txt	/*ack*
+ack-author	ack.txt	/*ack-author*
+ack.txt	ack.txt	/*ack.txt*
 align	Align.txt	/*align*
 align-align	Align.txt	/*align-align*
 align-codepoint	Align.txt	/*align-codepoint*
@@ -994,6 +1006,9 @@ taglist-session	taglist.txt	/*taglist-session*
 taglist-todo	taglist.txt	/*taglist-todo*
 taglist-using	taglist.txt	/*taglist-using*
 taglist.txt	taglist.txt	/*taglist.txt*
+tailminusf-about	tailminusf.txt	/*tailminusf-about*
+tailminusf-commands	tailminusf.txt	/*tailminusf-commands*
+tailminusf-configure	tailminusf.txt	/*tailminusf-configure*
 tiles.tags	jsp.txt	/*tiles.tags*
 twitvim-identi.ca	twitvim.txt	/*twitvim-identi.ca*
 twitvim.txt	twitvim.txt	/*twitvim.txt*

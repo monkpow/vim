@@ -60,13 +60,12 @@ autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 "autocmd BufWritePre *rb :%s/\s\+$//
 
 
-
-
 au Syntax css source ~/.vim/syntax/css.vim
 nmap = +
 " MAKE IT EASY TO UPDATE/RELOAD _vimrc
 nmap ,s :source ~/.vim/vimrc/.vimrc
 nmap ,v :sp ~/.vim/vimrc/.vimrc
+nmap ,l :!rake jslint paths=%
 
 " Make tab indent work the way I like it
 vnoremap < <gv
@@ -216,3 +215,5 @@ abbr restart_apache !sudo /etc/init.d/httpd restart
 abbr %% <%  %>hhhha
 abbr %= <%=  %>hhhhha
 
+
+map :jslint !rake jslint paths=%
