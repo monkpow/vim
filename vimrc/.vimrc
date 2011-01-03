@@ -201,7 +201,7 @@ set wildmode=list:longest
 set title
 
 "store swap files in my tmp dir
-set dir=~/tmp
+set dir=/tmp
 
 " break css declarations into multiline
 "nmap ,z :%s/{\([^}]*\)$/{\r\1/g:%s/^\([^{]*\)}/\1\r}/g
