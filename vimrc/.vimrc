@@ -86,9 +86,10 @@ nmap ,d :NERDTreeToggle
 " cleanup whitespace at end of line
 :nnoremap <silent> <F7> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
 
-colorscheme inkpot
+"colorscheme inkpot
 "colo aiseered_edit
 "colo nik_trans
+colo 256_asu1dark
 " make autocomplete menu a reasonable color
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 
