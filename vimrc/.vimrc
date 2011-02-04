@@ -89,6 +89,17 @@ colorscheme inkpot
 "colo aiseered_edit
 "colo nik_trans
 " make autocomplete menu a reasonable color
+"colo Mustang_Vim_Colorscheme_by_hcalves
+"colo beauty256
+"colo blueshift
+"colo charged-256
+"colo pyte
+"colo summerfruit256
+"colo twilight256
+"colo wombat256mod
+colo xoria256
+
+
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 
 "colo fruidle 
