@@ -217,7 +217,7 @@ set dir=~/tmp
 
 
 " abbreviations
-abbr cedit :sp ~/.vim/colors/inkpot.vim
+abbr cedit :sp ~/.vim/colors/inkpot_nik.vim
 
 " put a erb delimiter
 abbr %% <%  %>hhhha
