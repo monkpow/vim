@@ -12,7 +12,7 @@ set hlsearch
 set iskeyword+=:
 set laststatus=2 " shows the statusbar, ruler, etc.
 set list listchars=tab:>-,trail:. "show tabs, spaces, end of lines
-  set shell=bash
+set shell=bash
 set showmatch
 set sw=2 ts=2 sts=2
 set wmh=0 "minimum window hieght
@@ -60,13 +60,12 @@ autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 "autocmd BufWritePre *rb :%s/\s\+$//
 
 
-
-
 au Syntax css source ~/.vim/syntax/css.vim
 nmap = +
 " MAKE IT EASY TO UPDATE/RELOAD _vimrc
 nmap ,s :source ~/.vim/vimrc/.vimrc
 nmap ,v :sp ~/.vim/vimrc/.vimrc
+nmap ,l :!rake jslint paths=%
 
 " Make tab indent work the way I like it
 vnoremap < <gv
@@ -79,15 +78,18 @@ nmap <F3> :only
 nmap <F4> :ball
 nmap <F6> :set number!
 
+nmap ,a  i"test foo": function(){ with (this) { assert(false, 'no test written'); } }
+
 nmap ,b :HSBufExplorer
 nmap ,d :NERDTreeToggle
 
 " cleanup whitespace at end of line
 :nnoremap <silent> <F7> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
 
-colorscheme inkpot
+"colorscheme inkpot
 "colo aiseered_edit
 "colo nik_trans
+colo 256_asu1dark
 " make autocomplete menu a reasonable color
 "colo Mustang_Vim_Colorscheme_by_hcalves
 "colo beauty256
@@ -210,16 +212,20 @@ set wildmode=list:longest
 set title
 
 "store swap files in my tmp dir
-set dir=~/tmp
+set dir=/tmp
 
 " break css declarations into multiline
 "nmap ,z :%s/{\([^}]*\)$/{\r\1/g:%s/^\([^{]*\)}/\1\r}/g
 
 
 " abbreviations
-abbr cedit :sp ~/.vim/colors/inkpot_nik.vim
+abbr cedit :sp ~/.vim/colors/inkpot.vim
+abbr restart_apache !sudo /etc/init.d/httpd restart
+
 
 " put a erb delimiter
 abbr %% <%  %>hhhha
 abbr %= <%=  %>hhhhha
 
+
+map :jslint !rake jslint paths=%

@@ -30,7 +30,11 @@ def clear_indent(line)
 end
 
 def prints(line)
-  puts get_indent + line
+  if line.length > 0
+    puts get_indent + line
+  else
+    puts ""
+  end
 end
 
 def strip_strings_etc(line)
