@@ -222,6 +222,15 @@ set dir=/tmp
 abbr cedit :sp ~/.vim/colors/inkpot.vim
 abbr restart_apache !sudo /etc/init.d/httpd restart
 
+abbr ppp porting from viewpoints-endeca depot
+"r! head -n5 `ls 00*patch | head -n1`
+
+
+
+
+
+
+
 
 " put a erb delimiter
 abbr %% <%  %>hhhha
@@ -229,3 +238,45 @@ abbr %= <%=  %>hhhhha
 
 
 map :jslint !rake jslint paths=%
+
+
+" syntastic plugin
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_enable_signs=1
+let g:syntastic_auto_loc_list=1
+
+
+
+
+" help:yank from buffer to command line
+"i hit #vim on irc and asked - the answer i got was:
+
+":h c_ctrl-r
+
+"which yielded:
+
+"CTRL-R {0-9a-z"%#:-=.}                                  *c_CTRL-R* *c_<C-R>*
+               "Insert the contents of a numbered or named register.  Between
+               "typing CTRL-R and the second character '"' will be displayed
+               "to indicate that you are expected to enter the name of a
+               "register.
+               "The text is inserted as if you typed it, but mappings and
+               "abbreviations are not used.  Command-line completion through
+               "'wildchar' is not triggered though.  And characters that end
+               "the command line are inserted literally (<Esc>, <CR>, <NL>,
+               "<C-C>).  A <BS> or CTRL-W could still end the command line
+               "though, and remaining characters will then be interpreted in
+               "another mode, which might not be what you intended.
+               "Special registers:
+                       "'"'     the unnamed register, containing the text of
+                               "the last delete or yank
+                       "'%'     the current file name
+                       "'#'     the alternate file name
+                       "'*'     the clipboard contents (X11: primary selection)
+                       "'+'     the clipboard contents
+                       "'/'     the last search pattern
+                       "':'     the last command-line
+                       "'-'     the last small (less than a line) delete
