@@ -229,3 +229,6 @@ abbr %= <%=  %>hhhhha
 
 
 map :jslint !rake jslint paths=%
+
+
+":h c_ctrl-r  :  put paste buffer on command line
