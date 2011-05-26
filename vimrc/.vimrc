@@ -14,7 +14,7 @@ set laststatus=2 " shows the statusbar, ruler, etc.
 set list listchars=tab:>-,trail:. "show tabs, spaces, end of lines
 set shell=bash
 set showmatch
-set sw=2 ts=2 sts=2
+set sw=4 ts=4 sts=4
 set wmh=0 "minimum window hieght
 "set foldminlines  5
 set foldlevel=1
@@ -225,13 +225,6 @@ abbr restart_apache !sudo /etc/init.d/httpd restart
 abbr ppp porting from viewpoints-endeca depot
 "r! head -n5 `ls 00*patch | head -n1`
 
-
-
-
-
-
-
-
 " put a erb delimiter
 abbr %% <%  %>hhhha
 abbr %= <%=  %>hhhhha
@@ -242,7 +235,7 @@ map :jslint !rake jslint paths=%
 
 " syntastic plugin
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
 let g:syntastic_enable_signs=1
@@ -280,3 +273,32 @@ let g:syntastic_auto_loc_list=1
                        "'/'     the last search pattern
                        "':'     the last command-line
                        "'-'     the last small (less than a line) delete
+                       "
+                       "
+                       "
+                       
+
+
+
+"> But aliases don't work there because they are expanded only in 
+"> interactive shells. 
+
+"Use 
+
+        ":set shcf=-cl 
+        ":help shcf
+
+        "to get 
+
+                ":!alias 
+
+                "to give you the expected result. 
+                "
+                "
+                "
+
+
+"The following converts the current line to Title Case (all lowercase, except for initial uppercase letters):
+
+":s/\<\(\w\)\(\w*\)\>/\u\1\L\2/g
+"Explanation The search pattern is \<\(\w\)\(\w*\)\> which searches for \< (beginning of word), then \w (a word character), then \w* (zero or more word characters), then \> (end of word). The \(...\) create subexpressions to be recalled with \1 and \2 in the replacement. The replacement is \u\1\L\2 which substitutes the two subexpressions transformed: The \u converts the first character of what follows to uppercase, while \L converts all of what follows to lowercase.
