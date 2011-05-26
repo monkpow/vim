@@ -9,10 +9,22 @@ if !executable("pyflakes")
 endif
 
 function! SyntaxCheckers_python_GetLocList()
-    let makeprg = 'pyflakes '.shellescape(expand('%'))
+    let makeprg = 'pyflakes '.shellescape(expand('%')).' -r no'
     let errorformat = '%E%f:%l: could not compile,%-Z%p^,%W%f:%l: %m,%-G%.%#'
 
-    let errors = SyntasticMake({ 'makeprg': makeprg, 'errorformat': errorformat })
+    let pyflakes_errors = SyntasticMake({ 'makeprg': makeprg, 'errorformat': errorformat })
+    
+    let makeprg = 'pylint '.shellescape(expand('%')).' -r no'
+    let errorformat = '%E%f:%l: could not compile,%-Z%p^,%W%f:%l: %m,%-G%.%#'
+
+    let pylint_errors = SyntasticMake({ 'makeprg': makeprg, 'errorformat': errorformat })
+
+    let makeprg = 'pep8 '.shellescape(expand('%'))
+    let errorformat = '%E%f:%l: could not compile,%-Z%p^,%W%f:%l: %m,%-G%.%#'
+
+    let pep8_errors = SyntasticMake({ 'makeprg': makeprg, 'errorformat': errorformat })
+
+    let errors = pyflakes_errors + pylint_errors + pep8_errors
 
     for i in errors
         if i['type'] ==# 'E'
