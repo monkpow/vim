@@ -9,6 +9,10 @@
 "             See http://sam.zoy.org/wtfpl/COPYING for more details.
 "
 "============================================================================
+
+
+finish  " just bail because this is not working with Rails 3 syntax
+
 if exists("loaded_eruby_syntax_checker")
     finish
 endif
