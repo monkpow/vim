@@ -4,17 +4,18 @@ set autoindent
 set complete+=k
 set dictionary+=~/.vim/templates/code.complete
 set encoding=utf-8
-set expandtab
-set foldmethod=indent
+set expandtab "
+set foldmethod=indent 
 set foldlevel=2
-set history=1000
-set hlsearch
+set history=1000 
+set hlsearch  " highlight search terms
 set iskeyword+=:
 set laststatus=2 " shows the statusbar, ruler, etc.
-set list listchars=tab:>-,trail:. "show tabs, spaces, end of lines
+"set list listchars=tab:->,trail:_ "show tabs, spaces, end of lines
+
 set shell=bash
 set showmatch
-set sw=4 ts=4 sts=4
+set sw=2 ts=2 sts=2 " shiftwidth, tabsize and softtabsize
 set wmh=0 "minimum window hieght
 "set foldminlines  5
 set foldlevel=1
@@ -36,7 +37,8 @@ au! BufRead,BufNewFile *.tag                                         set filetyp
 au! BufRead,BufNewFile *.py                                          set filetype=python
 au! BufRead,BufNewFile *.rb                                          set filetype=ruby "equalprg=~/.vim/scripts/rbTidy/rbTidy.rb
 au! BufRead,BufNewFile *.erb                                         set filetype=eruby
-au! BufRead,BufNewFile *.css                                         set filetype=css dictionary+=~/.vim/wordlists/css.list omnifunc=csscomplete#CompleteCSS
+au! BufRead,BufNewFile *.css                                 set filetype=css dictionary+=~/.vim/wordlists/css.list omnifunc=csscomplete#CompleteCSS
+au! BufRead,BufNewFile *.scss                                 set filetype=css dictionary+=~/.vim/wordlists/css.list omnifunc=csscomplete#CompleteCSS
 au! BufRead,BufNewFile *.php                                         set filetype=htm
 au! BufRead,BufNewFile *.py                                          set filetype=python smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 au! BufRead,BufNewFile *.html                                        set filetype=html
@@ -95,11 +97,11 @@ colo 256_asu1dark
 "colo beauty256
 "colo blueshift
 "colo charged-256
-"colo pyte
+colo pyte
 "colo summerfruit256
 "colo twilight256
 "colo wombat256mod
-colo xoria256
+"colo xoria256
 
 
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
@@ -221,6 +223,7 @@ set dir=/tmp
 " abbreviations
 abbr cedit :sp ~/.vim/colors/inkpot.vim
 abbr restart_apache !sudo /etc/init.d/httpd restart
+abbr brake bundle exec rake
 
 abbr ppp porting from viewpoints-endeca depot
 "r! head -n5 `ls 00*patch | head -n1`
@@ -276,7 +279,7 @@ let g:syntastic_auto_loc_list=1
                        "
                        "
                        "
-                       
+
 
 
 
@@ -299,7 +302,23 @@ let g:syntastic_auto_loc_list=1
 
 "disable jslint line highlighting, because it is annoying me
 let g:JSLintHighlightErrorLine = 0
+
+"http://jaket.is-a-geek.com/blog/linux/math-substitution-in-vim
+
 "The following converts the current line to Title Case (all lowercase, except for initial uppercase letters):
 
 ":s/\<\(\w\)\(\w*\)\>/\u\1\L\2/g
 "Explanation The search pattern is \<\(\w\)\(\w*\)\> which searches for \< (beginning of word), then \w (a word character), then \w* (zero or more word characters), then \> (end of word). The \(...\) create subexpressions to be recalled with \1 and \2 in the replacement. The replacement is \u\1\L\2 which substitutes the two subexpressions transformed: The \u converts the first character of what follows to uppercase, while \L converts all of what follows to lowercase.
+
+
+" Attempt to highlight extra whitespace and bad formatting
+" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+highlight ExtraWhitespace ctermbg=red guibg=red
+highlight MissingWhitespace ctermbg=red guibg=red
+"au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+"au InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
+
+
+"match IncorrectWhitespace /}\w/
+"autocmd InsertLeave * redraw!

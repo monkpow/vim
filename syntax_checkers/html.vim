@@ -9,6 +9,8 @@
 "             See http://sam.zoy.org/wtfpl/COPYING for more details.
 "
 "============================================================================
+finish "not useful for fragment languages, esp django
+
 if exists("loaded_html_syntax_checker")
     finish
 endif

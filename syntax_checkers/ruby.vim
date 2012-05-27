@@ -9,6 +9,10 @@
 "             See http://sam.zoy.org/wtfpl/COPYING for more details.
 "
 "============================================================================
+
+finish " just cancel because its not working with rails 3 syntax
+
+
 if exists("loaded_ruby_syntax_checker")
     finish
 endif
