@@ -297,7 +297,8 @@ let g:syntastic_auto_loc_list=1
                 "
                 "
 
-
+"disable jslint line highlighting, because it is annoying me
+let g:JSLintHighlightErrorLine = 0
 "The following converts the current line to Title Case (all lowercase, except for initial uppercase letters):
 
 ":s/\<\(\w\)\(\w*\)\>/\u\1\L\2/g
