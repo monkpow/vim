@@ -1,4 +1,4 @@
-/*jslint laxbreak: true */
+/*jslint laxbreak: true, node: true */
 
 var fs, vm, sandbox, jslintCore = 'jslint-core.js';
 

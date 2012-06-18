@@ -13,6 +13,14 @@
 
 " Only do this when not done yet for this buffer
 set dictionary+=~/.vim/dictionarys/ruby.vim
+"set omnifunc=rubycomplete#Complete
+"let g:rubycomplete_buffer_loading = 1
+"let g:rubycomplete_rails = 1
+"let g:rubycomplete_classes_in_global = 1
+"set cinoptions=:0,p0,t0 cinwords=if,else,while,do,for,switch,case
+"set foldmethod=indent foldlevel=1
+
+
 
 if (exists("b:did_ftplugin"))
   finish

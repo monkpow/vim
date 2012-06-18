@@ -71,7 +71,7 @@ else
     let s:cmd = '/System/Library/Frameworks/JavaScriptCore.framework/Resources/jsc'
   elseif executable('js')
     let s:cmd = 'js'
-  else
+ else
     echoerr('No JS interpreter found. Checked for jsc, js (spidermonkey), and node')
   endif
 endif
