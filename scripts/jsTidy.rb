@@ -19,7 +19,7 @@ end
 def get_indent
   stringin=""
   @current_indent.times {
-    stringin=stringin+"  "
+    stringin=stringin+"\t"
   }
   return stringin
 end

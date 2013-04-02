@@ -23,6 +23,7 @@ set statusline+=%*
 set shell=bash
 set showmatch
 set sw=2 ts=2 sts=2 " shiftwidth, tabsize and softtabsize
+set tabstop=2
 set t_Co=256 "enable 256 colors
 set wmh=0 "minimum window hieght
 
@@ -58,9 +59,9 @@ vnoremap > >gv
 :nnoremap <silent> ,7 :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
 
 colo 256_asu1dark
-colo Mustang_Vim_Colorscheme_by_hcalves
 "colo blueshift
 colo charged-256
+colo fruit
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 
 silent! ruby nil
@@ -73,17 +74,19 @@ set backupskip=/tmp/*,/private/tmp/*"
 set dir=/tmp
 
 " syntastic plugin
-let g:syntastic_enable_signs=1
-let g:syntastic_auto_loc_list=1
+"let g:syntastic_enable_signs=1
+"let g:syntastic_auto_loc_list=1
 
 "disable jslint line highlighting, because it is annoying me
-"let g:JSLintHighlightErrorLine = 0
+let g:JSLintHighlightErrorLine = 0
 
 " Attempt to highlight extra whitespace and bad formatting
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 highlight ExtraWhitespace ctermbg=red guibg=red
 highlight MissingWhitespace ctermbg=red guibg=red
+highlight HashRocketNO ctermbg=red
 autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
+autocmd Syntax * syn match HashRocketNO /=>/
 
 " a few notes i want to remember 
 
