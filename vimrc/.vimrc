@@ -44,9 +44,11 @@ nmap ,s :source ~/.vim/vimrc/.vimrc
 nmap ,v :sp ~/.vim/vimrc/.vimrc
 nmap = +  " convenience for add one line to this split
 nmap - -  " remove one line from this split
-nmap gtf vt":sp gvgf  " open the file under cursor in a split
+nmap gtf vt":sp
+nmap gvgf  " open the file under cursor in a split
 nmap ,2 w  " change windows
-nmap ,3 :only  
+nmap ,3 :only
+  
 nmap ,4 :ball
 nmap ,5 :set number!
 nmap ,d :NERDTreeToggle
@@ -94,5 +96,20 @@ autocmd Syntax * syn match HashRocketNO /=>/
 ":h c_ctrl-r "CTRL-R {0-9a-z"%#:-=.} 
 
 " break css declarations into multiline
-"nmap ,z :%s/{\([^}]*\)$/{\r\1/g:%s/^\([^{]*\)}/\1\r}/g
+"nmap ,z :%s/{\([^}]*\)$/{\r\1/g
+":%s/^\([^{]*\)}/\1\r}/g
 "
+
+abbr ios iOS
+abbr iOs iOS
+abbr IOS iOS
+
+" disable arrow keys
+map <up> <nop>
+map <down> <nop>
+map <left> <nop>
+map <right> <nop>
+imap <up> <nop>
+imap <down> <nop>
+imap <left> <nop>
+imap <right> <nop>
