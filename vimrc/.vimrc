@@ -127,3 +127,7 @@ imap <up> <nop>
 imap <down> <nop>
 imap <left> <nop>
 imap <right> <nop>
+
+
+" syntastic!
+let g:syntastic_javascript_checkers = ['jshint']
