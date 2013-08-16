@@ -45,6 +45,16 @@ def strip_strings_etc(line)
   return t
 end
 
+def tunein_whitespace(line)
+  line.gsub! /function\(/, 'function ('
+  line.gsub! /if\(/, 'if ('
+  line.gsub! /\( /, '('
+  line.gsub! /\s\)/, ')'
+  line.gsub! /\t/, '  '
+  line.gsub! /\)\{/, ') {'
+  return line
+end
+
 #reverse_function_literal  
 # current fails on  geocoder.getLatLng(m.value,function(point) {
 #if line =~ /^(function)\s*([^(]*)(.*)/
@@ -100,6 +110,7 @@ def break_up_lines_with_semi_colons(line)
       break_up_one_line_for_and_if (line)
       add_white_space_to_punctuation(line) 
       clear_indent(line)
+      tunein_whitespace(line)
 
       #reverse_function_literal  
       #if line =~ /^(function)\s*([^(]*)(.*)/

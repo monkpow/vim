@@ -38,6 +38,8 @@ filetype plugin on
 filetype indent on
 
 autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
+" kill trailing whitespace on save
+autocmd BufWritePre *.js :%s/\s\+$//e
 au Syntax css source ~/.vim/syntax/css.vim
 
 nmap ,s :source ~/.vim/vimrc/.vimrc
@@ -63,7 +65,7 @@ vnoremap > >gv
 colo 256_asu1dark
 "colo blueshift
 colo charged-256
-colo fruit
+"colo fruit
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 
 silent! ruby nil
@@ -89,6 +91,18 @@ highlight MissingWhitespace ctermbg=red guibg=red
 highlight HashRocketNO ctermbg=red
 autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
 autocmd Syntax * syn match HashRocketNO /=>/
+
+" highlight lines longer than 120 chars
+highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
+"match OverLength /\%121v.*/
+
+highlight JSFunctionWhiteSpace ctermbg=darkred ctermfg=white guibg=#FFD9D9
+match JSFunctionWhiteSpace /function(/
+"match Todo /hey/
+
+"highlight JSParens ctermbg=darkred ctermfg=white guibg=#FFD9D9
+"match JSParens /( /
+
 
 " a few notes i want to remember 
 
