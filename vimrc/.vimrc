@@ -1,17 +1,15 @@
 set autoindent
 set complete+=k
-set dictionary+=~/.vim/templates/code.complete
 set encoding=utf-8
 set expandtab 
 set foldlevel=2
 set foldmethod=indent 
-set hidden
+set hidden   " hide buffers instead of closing them
 set history=1000 
 set hlsearch  " highlight search terms
 
 "status line stuff
 set laststatus=2 " shows the statusbar, ruler, etc.
-set laststatus=2
 set statusline=
 set statusline+=%f\ " file name
 set statusline+=%= " right align
@@ -21,9 +19,8 @@ set statusline+=%#warningmsg#
 set statusline+=%*
 
 set shell=bash
-set showmatch
+set showmatch  " show match for highlighted block marker (ie. {}, do end, etc)
 set sw=2 ts=2 sts=2 " shiftwidth, tabsize and softtabsize
-set tabstop=2
 set t_Co=256 "enable 256 colors
 set wmh=0 "minimum window hieght
 
@@ -37,20 +34,26 @@ syntax on
 filetype plugin on
 filetype indent on
 
-autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
+" when creating a new file (i.e. new t.html), use a template if one exists (e.g. html.tpl)
+" looks in ~/.vim/templates
+autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl  
+
 " kill trailing whitespace on save
 autocmd BufWritePre *.js :%s/\s\+$//e
+autocmd BufNewFile,BufRead *.scss             set ft=scss.css
+autocmd BufNewFile,BufRead *.less             set ft=less.css
+
 au Syntax css source ~/.vim/syntax/css.vim
 
+" easy edit vimrc
 nmap ,s :source ~/.vim/vimrc/.vimrc
 nmap ,v :sp ~/.vim/vimrc/.vimrc
+
+" window size
 nmap = +  " convenience for add one line to this split
 nmap - -  " remove one line from this split
-nmap gtf vt":sp
-nmap gvgf  " open the file under cursor in a split
 nmap ,2 w  " change windows
 nmap ,3 :only
-  
 nmap ,4 :ball
 nmap ,5 :set number!
 nmap ,d :NERDTreeToggle
@@ -62,11 +65,11 @@ vnoremap > >gv
 " cleanup whitespace at end of line
 :nnoremap <silent> ,7 :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
 
-colo 256_asu1dark
-"colo blueshift
-colo charged-256
-"colo fruit
+colo github
+
+" fix terrible highlighting and folding colors
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
+highlight Folded ctermbg=None ctermfg=Gray
 
 silent! ruby nil
 
@@ -76,10 +79,6 @@ set backupskip=/tmp/*,/private/tmp/*"
 
 "store swap files in my tmp dir
 set dir=/tmp
-
-" syntastic plugin
-"let g:syntastic_enable_signs=1
-"let g:syntastic_auto_loc_list=1
 
 "disable jslint line highlighting, because it is annoying me
 let g:JSLintHighlightErrorLine = 0
@@ -94,29 +93,7 @@ autocmd Syntax * syn match HashRocketNO /=>/
 
 " highlight lines longer than 120 chars
 highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
-"match OverLength /\%121v.*/
-
-highlight JSFunctionWhiteSpace ctermbg=darkred ctermfg=white guibg=#FFD9D9
-match JSFunctionWhiteSpace /function(/
-"match Todo /hey/
-
-"highlight JSParens ctermbg=darkred ctermfg=white guibg=#FFD9D9
-"match JSParens /( /
-
-
-" a few notes i want to remember 
-
-" help:yank from buffer to command line
-":h c_ctrl-r "CTRL-R {0-9a-z"%#:-=.} 
-
-" break css declarations into multiline
-"nmap ,z :%s/{\([^}]*\)$/{\r\1/g
-":%s/^\([^{]*\)}/\1\r}/g
-"
-
-abbr ios iOS
-abbr iOs iOS
-abbr IOS iOS
+match OverLength /\%121v.*/
 
 " disable arrow keys
 map <up> <nop>
@@ -131,3 +108,19 @@ imap <right> <nop>
 
 " syntastic!
 let g:syntastic_javascript_checkers = ['jshint']
+
+" never mis-spell iOS again
+abbr ios iOS
+abbr iOs iOS
+abbr IOS iOS
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""
+" a few notes i want to remember 
+"""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" help:yank from buffer to command line
+":h c_ctrl-r "CTRL-R {0-9a-z"%#:-=.} 
+
+" break css declarations into multiline
+"nmap ,z :%s/{\([^}]*\)$/{\r\1/g
+":%s/^\([^{]*\)}/\1\r}/g
