@@ -1,3 +1,6 @@
+" good article with useful defaults
+" http://nvie.com/posts/how-i-boosted-my-vim/
+
 set autoindent
 set complete+=k
 set encoding=utf-8
@@ -6,7 +9,19 @@ set foldlevel=2
 set foldmethod=indent 
 set hidden   " hide buffers instead of closing them
 set history=1000 
-set hlsearch  " highlight search terms
+set hlsearch      " highlight search terms
+set copyindent    " copy the previous indentation on autoindenting
+set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
+set showmatch     " set show matching parenthesis
+set smartcase     " ignore case if search pattern is all lowercase, case-sensitive otherwise
+set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
+set shell=bash
+set title                " change the terminal's title
+set visualbell           " don't beep
+set noerrorbells         " don't beep
+set sw=2 ts=2 sts=2 " shiftwidth, tabsize and softtabsize
+set t_Co=256 "enable 256 colors
+set wmh=0 "minimum window hieght
 
 "status line stuff
 set laststatus=2 " shows the statusbar, ruler, etc.
@@ -18,11 +33,9 @@ set statusline+=%h%1*%m%r%w%0* " flags
 set statusline+=%#warningmsg#
 set statusline+=%*
 
-set shell=bash
-set showmatch  " show match for highlighted block marker (ie. {}, do end, etc)
-set sw=2 ts=2 sts=2 " shiftwidth, tabsize and softtabsize
-set t_Co=256 "enable 256 colors
-set wmh=0 "minimum window hieght
+" highlight unwanted whitespace
+set list
+set listchars=tab:>.,trail:.,extends:#,nbsp:.
 
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
