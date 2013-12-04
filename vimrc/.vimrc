@@ -4,11 +4,11 @@
 set autoindent
 set complete+=k
 set encoding=utf-8
-set expandtab 
+set expandtab
 set foldlevel=2
-set foldmethod=indent 
+set foldmethod=indent
 set hidden   " hide buffers instead of closing them
-set history=1000 
+set history=1000
 set hlsearch      " highlight search terms
 set copyindent    " copy the previous indentation on autoindenting
 set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
@@ -35,7 +35,7 @@ set statusline+=%*
 
 " highlight unwanted whitespace
 set list
-set listchars=tab:>.,trail:.,extends:#,nbsp:.
+set listchars=tab:>~,trail:~,extends:#,nbsp:~
 
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
@@ -49,7 +49,7 @@ filetype indent on
 
 " when creating a new file (i.e. new t.html), use a template if one exists (e.g. html.tpl)
 " looks in ~/.vim/templates
-autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl  
+autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 
 " kill trailing whitespace on save
 autocmd BufWritePre *.js :%s/\s\+$//e
@@ -128,11 +128,11 @@ abbr iOs iOS
 abbr IOS iOS
 
 """""""""""""""""""""""""""""""""""""""""""""""""""
-" a few notes i want to remember 
+" a few notes i want to remember
 """""""""""""""""""""""""""""""""""""""""""""""""""
 
 " help:yank from buffer to command line
-":h c_ctrl-r "CTRL-R {0-9a-z"%#:-=.} 
+":h c_ctrl-r "CTRL-R {0-9a-z"%#:-=.}
 
 " break css declarations into multiline
 "nmap ,z :%s/{\([^}]*\)$/{\r\1/g
