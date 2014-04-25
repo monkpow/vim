@@ -121,6 +121,7 @@ imap <right> <nop>
 " syntastic!
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_aggregate_errors = 1
+let g:syntastic_css_checkers = ['csslint', 'prettycss']
 
 " never mis-spell iOS again
 abbr ios iOS
