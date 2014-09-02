@@ -53,7 +53,7 @@ autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 
 " kill trailing whitespace on save
 autocmd BufWritePre *.js :%s/\s\+$//e
-autocmd BufNewFile,BufRead *.scss             set ft=scss
+autocmd BufNewFile,BufRead *.scss             set ft=scss.css
 autocmd BufNewFile,BufRead *.less             set ft=less.css
 autocmd BufNewFile,BufRead *.json             set ft=javascript
 
@@ -145,7 +145,6 @@ imap <right> <nop>
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_css_checkers = ['csslint', 'prettycss']
-let g:syntastic_scss_checkers = ['scss_lint']
 
 " never mis-spell iOS again
 abbr ios iOS
@@ -162,6 +161,3 @@ abbr IOS iOS
 " break css declarations into multiline
 "nmap ,z :%s/{\([^}]*\)$/{\r\1/g
 ":%s/^\([^{]*\)}/\1\r}/g
-"
-"
-execute pathogen#infect()
