@@ -55,6 +55,7 @@ autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 autocmd BufWritePre *.js :%s/\s\+$//e
 autocmd BufNewFile,BufRead *.scss             set ft=scss.css
 autocmd BufNewFile,BufRead *.less             set ft=less.css
+autocmd BufNewFile,BufRead *.json             set ft=javascript
 
 au Syntax css source ~/.vim/syntax/css.vim
 
@@ -78,7 +79,29 @@ vnoremap > >gv
 " cleanup whitespace at end of line
 :nnoremap <silent> ,7 :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
 
+function! CleanJson()
+  %s/\([{|}]\)/\r\1\r/g
+  %s/\,/,\r/g
+  %s/}\n,/},/g
+  %s/}\n\s*\n}/}\r}/g
+  retab
+endfunction
+
 colo github
+colo 256_automation
+colo lucius
+"LuciusDark (dark default)
+"LuciusDarkHighContrast
+LuciusDarkLowContrast
+"LuciusBlack
+"LuciusBlackHighContrast
+"LuciusBlackLowContrast
+"LuciusLight (light default)
+"LuciusLightLowContrast
+"LuciusWhite
+"LuciusWhiteLowContrast
+
+
 
 " fix terrible highlighting and folding colors
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
