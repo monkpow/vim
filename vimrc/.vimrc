@@ -53,7 +53,7 @@ autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 
 " kill trailing whitespace on save
 autocmd BufWritePre *.js :%s/\s\+$//e
-autocmd BufNewFile,BufRead *.scss             set ft=scss.css
+autocmd BufNewFile,BufRead *.scss             set ft=scss
 autocmd BufNewFile,BufRead *.less             set ft=less.css
 autocmd BufNewFile,BufRead *.json             set ft=javascript
 
@@ -161,3 +161,5 @@ abbr IOS iOS
 " break css declarations into multiline
 "nmap ,z :%s/{\([^}]*\)$/{\r\1/g
 ":%s/^\([^{]*\)}/\1\r}/g
+
+execute pathogen#infect()
