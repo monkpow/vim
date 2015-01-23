@@ -1,441 +1,309 @@
-" Vim indent file
-" Language: Javascript
-" Acknowledgement: Based off of vim-ruby maintained by Nikolai Weibull http://vim-ruby.rubyforge.org
+" Vim syntax file
+" Language:     JavaScript
+" Maintainer:   vim-javascript community
+" URL:          https://github.com/pangloss/vim-javascript
 
-" 0. Initialization {{{1
-" =================
-
-" Only load this indent file when no other was loaded.
-if exists("b:did_indent")
-  finish
-endif
-let b:did_indent = 1
-
-setlocal nosmartindent
-
-" Now, set up our indentation expression and keys that trigger it.
-setlocal indentexpr=GetJavascriptIndent()
-setlocal indentkeys=0{,0},0),0],0\,,!^F,o,O,e
-
-" Only define the function once.
-if exists("*GetJavascriptIndent")
-  finish
+if !exists("main_syntax")
+  if version < 600
+    syntax clear
+  elseif exists("b:current_syntax")
+    finish
+  endif
+  let main_syntax = 'javascript'
 endif
 
-let s:cpo_save = &cpo
-set cpo&vim
-
-" 1. Variables {{{1
-" ============
-
-let s:js_keywords = '^\s*\(break\|case\|catch\|continue\|debugger\|default\|delete\|do\|else\|finally\|for\|function\|if\|in\|instanceof\|new\|return\|switch\|this\|throw\|try\|typeof\|var\|void\|while\|with\)'
-
-" Regex of syntax group names that are or delimit string or are comments.
-let s:syng_strcom = 'string\|regex\|comment\c'
-
-" Regex of syntax group names that are strings.
-let s:syng_string = 'regex\c'
-
-" Regex of syntax group names that are strings or documentation.
-let s:syng_multiline = 'comment\c'
-
-" Regex of syntax group names that are line comment.
-let s:syng_linecom = 'linecomment\c'
-
-" Expression used to check whether we should skip a match with searchpair().
-let s:skip_expr = "synIDattr(synID(line('.'),col('.'),1),'name') =~ '".s:syng_strcom."'"
-
-let s:line_term = '\s*\%(\%(\/\/\).*\)\=$'
-
-" Regex that defines continuation lines, not including (, {, or [.
-let s:continuation_regex = '\%([\\*+/.:]\|\%(<%\)\@<![=-]\|\W[|&?]\|||\|&&\)' . s:line_term
-
-" Regex that defines continuation lines.
-" TODO: this needs to deal with if ...: and so on
-let s:msl_regex = '\%([\\*+/.:([]\|\%(<%\)\@<![=-]\|\W[|&?]\|||\|&&\)' . s:line_term
-
-let s:one_line_scope_regex = '\<\%(if\|else\|for\|while\)\>[^{;]*' . s:line_term
-
-" Regex that defines blocks.
-let s:block_regex = '\%({\)\s*\%(|\%([*@]\=\h\w*,\=\s*\)\%(,\s*[*@]\=\h\w*\)*|\)\=' . s:line_term
-
-let s:var_stmt = '^\s*var'
-
-let s:comma_first = '^\s*,'
-let s:comma_last = ',\s*$'
-
-" 2. Auxiliary Functions {{{1
-" ======================
-
-" Check if the character at lnum:col is inside a string, comment, or is ascii.
-function s:IsInStringOrComment(lnum, col)
-  return synIDattr(synID(a:lnum, a:col, 1), 'name') =~ s:syng_strcom
-endfunction
-
-" Check if the character at lnum:col is inside a string.
-function s:IsInString(lnum, col)
-  return synIDattr(synID(a:lnum, a:col, 1), 'name') =~ s:syng_string
-endfunction
-
-" Check if the character at lnum:col is inside a multi-line comment.
-function s:IsInMultilineComment(lnum, col)
-  return synIDattr(synID(a:lnum, a:col, 1), 'name') =~ s:syng_multiline
-endfunction
-
-" Check if the character at lnum:col is a line comment.
-function s:IsLineComment(lnum, col)
-  return synIDattr(synID(a:lnum, a:col, 1), 'name') =~ s:syng_linecom
-endfunction
-
-" Find line above 'lnum' that isn't empty, in a comment, or in a string.
-function s:PrevNonBlankNonString(lnum)
-  let in_block = 0
-  let lnum = prevnonblank(a:lnum)
-  while lnum > 0
-    " Go in and out of blocks comments as necessary.
-    " If the line isn't empty (with opt. comment) or in a string, end search.
-    let line = getline(lnum)
-    if line =~ '/\*'
-      if in_block
-        let in_block = 0
-      else
-        break
-      endif
-    elseif !in_block && line =~ '\*/'
-      let in_block = 1
-    elseif !in_block && line !~ '^\s*\%(//\).*$' && !(s:IsInStringOrComment(lnum, 1) && s:IsInStringOrComment(lnum, strlen(line)))
-      break
-    endif
-    let lnum = prevnonblank(lnum - 1)
-  endwhile
-  return lnum
-endfunction
-
-" Find line above 'lnum' that started the continuation 'lnum' may be part of.
-function s:GetMSL(lnum, in_one_line_scope)
-  " Start on the line we're at and use its indent.
-  let msl = a:lnum
-  let lnum = s:PrevNonBlankNonString(a:lnum - 1)
-  while lnum > 0
-    " If we have a continuation line, or we're in a string, use line as MSL.
-    " Otherwise, terminate search as we have found our MSL already.
-    let line = getline(lnum)
-    let col = match(line, s:msl_regex) + 1
-    if (col > 0 && !s:IsInStringOrComment(lnum, col)) || s:IsInString(lnum, strlen(line))
-      let msl = lnum
-    else
-      " Don't use lines that are part of a one line scope as msl unless the
-      " flag in_one_line_scope is set to 1
-      "
-      if a:in_one_line_scope
-        break
-      end
-      let msl_one_line = s:Match(lnum, s:one_line_scope_regex)
-      if msl_one_line == 0
-        break
-      endif
-    endif
-    let lnum = s:PrevNonBlankNonString(lnum - 1)
-  endwhile
-  return msl
-endfunction
-
-function s:RemoveTrailingComments(content)
-  let single = '\/\/\(.*\)\s*$'
-  let multi = '\/\*\(.*\)\*\/\s*$'
-  return substitute(substitute(a:content, single, '', ''), multi, '', '')
-endfunction
-
-" Find if the string is inside var statement (but not the first string)
-function s:InMultiVarStatement(lnum)
-  let lnum = s:PrevNonBlankNonString(a:lnum - 1)
-
-"  let type = synIDattr(synID(lnum, indent(lnum) + 1, 0), 'name')
-
-  " loop through previous expressions to find a var statement
-  while lnum > 0
-    let line = getline(lnum)
-
-    " if the line is a js keyword
-    if (line =~ s:js_keywords)
-      " check if the line is a var stmt
-      " if the line has a comma first or comma last then we can assume that we
-      " are in a multiple var statement
-      if (line =~ s:var_stmt)
-        return lnum
-      endif
-
-      " other js keywords, not a var
-      return 0
-    endif
-
-    let lnum = s:PrevNonBlankNonString(lnum - 1)
-  endwhile
-
-  " beginning of program, not a var
-  return 0
-endfunction
-
-" Find line above with beginning of the var statement or returns 0 if it's not
-" this statement
-function s:GetVarIndent(lnum)
-  let lvar = s:InMultiVarStatement(a:lnum)
-  let prev_lnum = s:PrevNonBlankNonString(a:lnum - 1)
-
-  if lvar
-    let line = s:RemoveTrailingComments(getline(prev_lnum))
-
-    " if the previous line doesn't end in a comma, return to regular indent
-    if (line !~ s:comma_last)
-      return indent(prev_lnum) - &sw
-    else
-      return indent(lvar) + &sw
-    endif
-  endif
-
-  return -1
-endfunction
-
-
-" Check if line 'lnum' has more opening brackets than closing ones.
-function s:LineHasOpeningBrackets(lnum)
-  let open_0 = 0
-  let open_2 = 0
-  let open_4 = 0
-  let line = getline(a:lnum)
-  let pos = match(line, '[][(){}]', 0)
-  while pos != -1
-    if !s:IsInStringOrComment(a:lnum, pos + 1)
-      let idx = stridx('(){}[]', line[pos])
-      if idx % 2 == 0
-        let open_{idx} = open_{idx} + 1
-      else
-        let open_{idx - 1} = open_{idx - 1} - 1
-      endif
-    endif
-    let pos = match(line, '[][(){}]', pos + 1)
-  endwhile
-  return (open_0 > 0) . (open_2 > 0) . (open_4 > 0)
-endfunction
-
-function s:Match(lnum, regex)
-  let col = match(getline(a:lnum), a:regex) + 1
-  return col > 0 && !s:IsInStringOrComment(a:lnum, col) ? col : 0
-endfunction
-
-function s:IndentWithContinuation(lnum, ind, width)
-  " Set up variables to use and search for MSL to the previous line.
-  let p_lnum = a:lnum
-  let lnum = s:GetMSL(a:lnum, 1)
-  let line = getline(lnum)
-
-  " If the previous line wasn't a MSL and is continuation return its indent.
-  " TODO: the || s:IsInString() thing worries me a bit.
-  if p_lnum != lnum
-    if s:Match(p_lnum,s:continuation_regex)||s:IsInString(p_lnum,strlen(line))
-      return a:ind
-    endif
-  endif
-
-  " Set up more variables now that we know we aren't continuation bound.
-  let msl_ind = indent(lnum)
-
-  " If the previous line ended with [*+/.-=], start a continuation that
-  " indents an extra level.
-  if s:Match(lnum, s:continuation_regex)
-    if lnum == p_lnum
-      return msl_ind + a:width
-    else
-      return msl_ind
-    endif
-  endif
-
-  return a:ind
-endfunction
-
-function s:InOneLineScope(lnum)
-  let msl = s:GetMSL(a:lnum, 1)
-  if msl > 0 && s:Match(msl, s:one_line_scope_regex)
-    return msl
-  endif
-  return 0
-endfunction
-
-function s:ExitingOneLineScope(lnum)
-  let msl = s:GetMSL(a:lnum, 1)
-  if msl > 0
-    " if the current line is in a one line scope ..
-    if s:Match(msl, s:one_line_scope_regex)
-      return 0
-    else
-      let prev_msl = s:GetMSL(msl - 1, 1)
-      if s:Match(prev_msl, s:one_line_scope_regex)
-        return prev_msl
-      endif
-    endif
-  endif
-  return 0
-endfunction
-
-" 3. GetJavascriptIndent Function {{{1
-" =========================
-
-function GetJavascriptIndent()
-  " 3.1. Setup {{{2
-  " ----------
-
-  " Set up variables for restoring position in file.  Could use v:lnum here.
-  let vcol = col('.')
-
-  " 3.2. Work on the current line {{{2
-  " -----------------------------
-
-  let ind = -1
-  " Get the current line.
-  let line = getline(v:lnum)
-  " previous nonblank line number
-  let prevline = prevnonblank(v:lnum - 1)
-
-  " If we got a closing bracket on an empty line, find its match and indent
-  " according to it.  For parentheses we indent to its column - 1, for the
-  " others we indent to the containing line's MSL's level.  Return -1 if fail.
-  let col = matchend(line, '^\s*[],})]')
-  if col > 0 && !s:IsInStringOrComment(v:lnum, col)
-    call cursor(v:lnum, col)
-
-    let lvar = s:InMultiVarStatement(v:lnum)
-    if lvar
-      let prevline_contents = s:RemoveTrailingComments(getline(prevline))
-
-      " check for comma first
-      if (line[col - 1] =~ ',')
-        " if the previous line ends in comma or semicolon don't indent
-        if (prevline_contents =~ '[;,]\s*$')
-          return indent(s:GetMSL(line('.'), 0))
-        " get previous line indent, if it's comma first return prevline indent
-        elseif (prevline_contents =~ s:comma_first)
-          return indent(prevline)
-        " otherwise we indent 1 level
-        else
-          return indent(lvar) + &sw
-        endif
-      endif
-    endif
-  endif
-  return 0
-endfunction
-
-" 3. GetJavascriptIndent Function {{{1
-" =========================
-
-function GetJavascriptIndent()
-  " 3.1. Setup {{{2
-  " ----------
-
-  " Set up variables for restoring position in file.  Could use v:lnum here.
-  let vcol = col('.')
-
-
-    let bs = strpart('(){}[]', stridx(')}]', line[col - 1]) * 2, 2)
-    if searchpair(escape(bs[0], '\['), '', bs[1], 'bW', s:skip_expr) > 0
-      if line[col-1]==')' && col('.') != col('$') - 1
-        let ind = virtcol('.')-1
-      else
-        let ind = indent(s:GetMSL(line('.'), 0))
-      endif
-    endif
-    return ind
-  endif
-
-  " If the line is comma first, dedent 1 level
-  if (getline(prevline) =~ s:comma_first)
-    return indent(prevline) - &sw
-  endif
-
-  " If we are in a multi-line comment, cindent does the right thing.
-  if s:IsInMultilineComment(v:lnum, 1) && !s:IsLineComment(v:lnum, 1)
-    return cindent(v:lnum)
-  endif
-
-  " Check for multiple var assignments
-"  let var_indent = s:GetVarIndent(v:lnum)
-"  if var_indent >= 0
-"    return var_indent
-"  endif
-
-  " 3.3. Work on the previous line. {{{2
-  " -------------------------------
-
-  " If the line is empty and the previous nonblank line was a multi-line
-  " comment, use that comment's indent. Deduct one char to account for the
-  " space in ' */'.
-  if line =~ '^\s*$' && s:IsInMultilineComment(prevline, 1)
-    return indent(prevline) - 1
-  endif
-
-  " Find a non-blank, non-multi-line string line above the current line.
-  let lnum = s:PrevNonBlankNonString(v:lnum - 1)
-
-  " If the line is empty and inside a string, use the previous line.
-  if line =~ '^\s*$' && lnum != prevline
-    return indent(prevnonblank(v:lnum))
-  endif
-
-  " At the start of the file use zero indent.
-  if lnum == 0
-    return 0
-  endif
-
-  " Set up variables for current line.
-  let line = getline(lnum)
-  let ind = indent(lnum)
-
-  " If the previous line ended with a block opening, add a level of indent.
-  if s:Match(lnum, s:block_regex)
-    return indent(s:GetMSL(lnum, 0)) + &sw
-  endif
-
-  " If the previous line contained an opening bracket, and we are still in it,
-  " add indent depending on the bracket type.
-  if line =~ '[[({]'
-    let counts = s:LineHasOpeningBrackets(lnum)
-    if counts[0] == '1' && searchpair('(', '', ')', 'bW', s:skip_expr) > 0
-      if col('.') + 1 == col('$')
-        return ind + &sw
-      else
-        return virtcol('.')
-      endif
-    elseif counts[1] == '1' || counts[2] == '1'
-      return ind + &sw
-    else
-      call cursor(v:lnum, vcol)
-    end
-  endif
-
-  " 3.4. Work on the MSL line. {{{2
-  " --------------------------
-
-  let ind_con = ind
-  let ind = s:IndentWithContinuation(lnum, ind_con, &sw)
-
-  " }}}2
-  "
-  "
-  let ols = s:InOneLineScope(lnum)
-  if ols > 0
-    let ind = ind + &sw
+if !exists('g:javascript_conceal')
+  let g:javascript_conceal = 0
+endif
+
+"" Drop fold if it is set but VIM doesn't support it.
+let b:javascript_fold='true'
+if version < 600    " Don't support the old version
+  unlet! b:javascript_fold
+endif
+
+"" dollar sign is permittd anywhere in an identifier
+setlocal iskeyword+=$
+
+syntax sync fromstart
+
+syntax match   jsNoise           /\%(:\|,\|\;\|\.\)/
+
+"" Program Keywords
+syntax keyword jsStorageClass   const var let
+syntax keyword jsOperator       delete instanceof typeof void new in
+syntax match   jsOperator       /\(!\||\|&\|+\|-\|<\|>\|=\|%\|\/\|*\|\~\|\^\)/
+syntax keyword jsBooleanTrue    true
+syntax keyword jsBooleanFalse   false
+syntax keyword jsCommonJS       require module exports
+
+"" JavaScript comments
+syntax keyword jsCommentTodo    TODO FIXME XXX TBD contained
+syntax region  jsLineComment    start=+\/\/+ end=+$+ keepend contains=jsCommentTodo,@Spell
+syntax region  jsEnvComment     start="\%^#!" end="$" display
+syntax region  jsLineComment    start=+^\s*\/\/+ skip=+\n\s*\/\/+ end=+$+ keepend contains=jsCommentTodo,@Spell fold
+syntax region  jsCvsTag         start="\$\cid:" end="\$" oneline contained
+syntax region  jsComment        start="/\*"  end="\*/" contains=jsCommentTodo,jsCvsTag,@Spell fold
+
+"" JSDoc / JSDoc Toolkit
+if !exists("javascript_ignore_javaScriptdoc")
+  syntax case ignore
+
+  "" syntax coloring for javadoc comments (HTML)
+  "syntax include @javaHtml <sfile>:p:h/html.vim
+  "unlet b:current_syntax
+
+  syntax region jsDocComment      matchgroup=jsComment start="/\*\*\s*"  end="\*/" contains=jsDocTags,jsCommentTodo,jsCvsTag,@jsHtml,@Spell fold
+
+  " tags containing a param
+  syntax match  jsDocTags         contained "@\(alias\|augments\|borrows\|class\|constructs\|default\|defaultvalue\|emits\|exception\|exports\|extends\|file\|fires\|kind\|listens\|member\|member[oO]f\|mixes\|module\|name\|namespace\|requires\|template\|throws\|var\|variation\|version\)\>" nextgroup=jsDocParam skipwhite
+  " tags containing type and param
+  syntax match  jsDocTags         contained "@\(arg\|argument\|param\|property\)\>" nextgroup=jsDocType skipwhite
+  " tags containing type but no param
+  syntax match  jsDocTags         contained "@\(callback\|define\|enum\|external\|implements\|this\|type\|typedef\|return\|returns\)\>" nextgroup=jsDocTypeNoParam skipwhite
+  " tags containing references
+  syntax match  jsDocTags         contained "@\(lends\|see\|tutorial\)\>" nextgroup=jsDocSeeTag skipwhite
+  " other tags (no extra syntax)
+  syntax match  jsDocTags         contained "@\(abstract\|access\|author\|classdesc\|constant\|const\|constructor\|copyright\|deprecated\|desc\|description\|dict\|event\|example\|file[oO]verview\|final\|function\|global\|ignore\|inheritDoc\|inner\|instance\|interface\|license\|method\|mixin\|nosideeffects\|override\|overview\|preserve\|private\|protected\|public\|readonly\|since\|static\|struct\|todo\|summary\|undocumented\|virtual\)\>"
+
+  syntax region jsDocType         start="{" end="}" oneline contained nextgroup=jsDocParam skipwhite
+  syntax match  jsDocType         contained "\%(#\|\"\|\w\|\.\|:\|\/\)\+" nextgroup=jsDocParam skipwhite
+  syntax region jsDocTypeNoParam  start="{" end="}" oneline contained
+  syntax match  jsDocTypeNoParam  contained "\%(#\|\"\|\w\|\.\|:\|\/\)\+"
+  syntax match  jsDocParam        contained "\%(#\|\"\|{\|}\|\w\|\.\|:\|\/\)\+"
+  syntax region jsDocSeeTag       contained matchgroup=jsDocSeeTag start="{" end="}" contains=jsDocTags
+
+  syntax case match
+endif   "" JSDoc end
+
+syntax case match
+
+"" Syntax in the JavaScript code
+syntax match   jsFuncCall        /\k\+\%(\s*(\)\@=/
+syntax match   jsSpecial         "\v\\%(0|\\x\x\{2\}\|\\u\x\{4\}\|\c[A-Z]|.)" contained
+syntax match   jsTemplateVar     "\${.\{-}}" contained
+syntax region  jsStringD         start=+"+  skip=+\\\("\|$\)+  end=+"\|$+  contains=jsSpecial,@htmlPreproc,@Spell
+syntax region  jsStringS         start=+'+  skip=+\\\('\|$\)+  end=+'\|$+  contains=jsSpecial,@htmlPreproc,@Spell
+syntax region  jsTemplateString  start=+`+  skip=+\\\(`\|$\)+  end=+`\|$+  contains=jsTemplateVar,jsSpecial,@htmlPreproc
+syntax region  jsRegexpCharClass start=+\[+ skip=+\\.+ end=+\]+ contained
+syntax match   jsRegexpBoundary   "\v%(\<@![\^$]|\\[bB])" contained
+syntax match   jsRegexpBackRef   "\v\\[1-9][0-9]*" contained
+syntax match   jsRegexpQuantifier "\v\\@<!%([?*+]|\{\d+%(,|,\d+)?})\??" contained
+syntax match   jsRegexpOr        "\v\<@!\|" contained
+syntax match   jsRegexpMod       "\v\(@<=\?[:=!>]" contained
+syntax cluster jsRegexpSpecial   contains=jsSpecial,jsRegexpBoundary,jsRegexpBackRef,jsRegexpQuantifier,jsRegexpOr,jsRegexpMod
+syntax region  jsRegexpGroup     start="\\\@<!(" skip="\\.\|\[\(\\.\|[^]]\)*\]" end="\\\@<!)" contained contains=jsRegexpCharClass,@jsRegexpSpecial keepend
+syntax region  jsRegexpString    start=+\(\(\(return\|case\)\s\+\)\@<=\|\(\([)\]"']\|\d\|\w\)\s*\)\@<!\)/\(\*\|/\)\@!+ skip=+\\.\|\[\(\\.\|[^]]\)*\]+ end=+/[gimy]\{,4}+ contains=jsRegexpCharClass,jsRegexpGroup,@jsRegexpSpecial,@htmlPreproc oneline keepend
+syntax match   jsNumber          /\<-\=\d\+L\=\>\|\<0[xX]\x\+\>/
+syntax keyword jsNumber          Infinity
+syntax match   jsFloat           /\<-\=\%(\d\+\.\d\+\|\d\+\.\|\.\d\+\)\%([eE][+-]\=\d\+\)\=\>/
+syntax match   jsObjectKey       /\<[a-zA-Z_$][0-9a-zA-Z_$]*\(\s*:\)\@=/ contains=jsFunctionKey contained
+syntax match   jsFunctionKey     /\<[a-zA-Z_$][0-9a-zA-Z_$]*\(\s*:\s*function\s*\)\@=/ contained
+
+exe 'syntax keyword jsNull      null      '.(exists('g:javascript_conceal_null')        ? 'conceal cchar='.g:javascript_conceal_null        : '')
+exe 'syntax keyword jsReturn    return    '.(exists('g:javascript_conceal_return')      ? 'conceal cchar='.g:javascript_conceal_return      : '')
+exe 'syntax keyword jsUndefined undefined '.(exists('g:javascript_conceal_undefined')   ? 'conceal cchar='.g:javascript_conceal_undefined   : '')
+exe 'syntax keyword jsNan       NaN       '.(exists('g:javascript_conceal_NaN')         ? 'conceal cchar='.g:javascript_conceal_NaN         : '')
+exe 'syntax keyword jsPrototype prototype '.(exists('g:javascript_conceal_prototype')   ? 'conceal cchar='.g:javascript_conceal_prototype   : '')
+exe 'syntax keyword jsThis      this      '.(exists('g:javascript_conceal_this')        ? 'conceal cchar='.g:javascript_conceal_this        : '')
+
+"" Statement Keywords
+syntax keyword jsStatement      break continue with
+syntax keyword jsConditional    if else switch
+syntax keyword jsRepeat         do while for
+syntax keyword jsLabel          case default
+syntax keyword jsKeyword        yield import export default extends class
+syntax keyword jsException      try catch throw finally
+
+syntax keyword jsGlobalObjects   Array Boolean Date Function Iterator Number Object RegExp String Proxy ParallelArray ArrayBuffer DataView Float32Array Float64Array Int16Array Int32Array Int8Array Uint16Array Uint32Array Uint8Array Uint8ClampedArray Intl JSON Math console document window
+syntax match   jsGlobalObjects  /\%(Intl\.\)\@<=\(Collator\|DateTimeFormat\|NumberFormat\)/
+
+syntax keyword jsExceptions     Error EvalError InternalError RangeError ReferenceError StopIteration SyntaxError TypeError URIError
+
+syntax keyword jsBuiltins       decodeURI decodeURIComponent encodeURI encodeURIComponent eval isFinite isNaN parseFloat parseInt uneval
+
+syntax keyword jsFutureKeys     abstract enum int short boolean interface static byte long super char final native synchronized float package throws goto private transient debugger implements protected volatile double public
+
+"" DOM/HTML/CSS specified things
+
+" DOM2 Objects
+syntax keyword jsGlobalObjects  DOMImplementation DocumentFragment Document Node NodeList NamedNodeMap CharacterData Attr Element Text Comment CDATASection DocumentType Notation Entity EntityReference ProcessingInstruction
+syntax keyword jsExceptions     DOMException
+
+" DOM2 CONSTANT
+syntax keyword jsDomErrNo       INDEX_SIZE_ERR DOMSTRING_SIZE_ERR HIERARCHY_REQUEST_ERR WRONG_DOCUMENT_ERR INVALID_CHARACTER_ERR NO_DATA_ALLOWED_ERR NO_MODIFICATION_ALLOWED_ERR NOT_FOUND_ERR NOT_SUPPORTED_ERR INUSE_ATTRIBUTE_ERR INVALID_STATE_ERR SYNTAX_ERR INVALID_MODIFICATION_ERR NAMESPACE_ERR INVALID_ACCESS_ERR
+syntax keyword jsDomNodeConsts  ELEMENT_NODE ATTRIBUTE_NODE TEXT_NODE CDATA_SECTION_NODE ENTITY_REFERENCE_NODE ENTITY_NODE PROCESSING_INSTRUCTION_NODE COMMENT_NODE DOCUMENT_NODE DOCUMENT_TYPE_NODE DOCUMENT_FRAGMENT_NODE NOTATION_NODE
+
+" HTML events and internal variables
+syntax case ignore
+syntax keyword jsHtmlEvents     onblur onclick oncontextmenu ondblclick onfocus onkeydown onkeypress onkeyup onmousedown onmousemove onmouseout onmouseover onmouseup onresize
+syntax case match
+
+" Follow stuff should be highligh within a special context
+" While it can't be handled with context depended with Regex based highlight
+" So, turn it off by default
+if exists("javascript_enable_domhtmlcss")
+
+    " DOM2 things
+    syntax match jsDomElemAttrs     contained /\%(nodeName\|nodeValue\|nodeType\|parentNode\|childNodes\|firstChild\|lastChild\|previousSibling\|nextSibling\|attributes\|ownerDocument\|namespaceURI\|prefix\|localName\|tagName\)\>/
+    syntax match jsDomElemFuncs     contained /\%(insertBefore\|replaceChild\|removeChild\|appendChild\|hasChildNodes\|cloneNode\|normalize\|isSupported\|hasAttributes\|getAttribute\|setAttribute\|removeAttribute\|getAttributeNode\|setAttributeNode\|removeAttributeNode\|getElementsByTagName\|getAttributeNS\|setAttributeNS\|removeAttributeNS\|getAttributeNodeNS\|setAttributeNodeNS\|getElementsByTagNameNS\|hasAttribute\|hasAttributeNS\)\>/ nextgroup=jsParen skipwhite
+    " HTML things
+    syntax match jsHtmlElemAttrs    contained /\%(className\|clientHeight\|clientLeft\|clientTop\|clientWidth\|dir\|id\|innerHTML\|lang\|length\|offsetHeight\|offsetLeft\|offsetParent\|offsetTop\|offsetWidth\|scrollHeight\|scrollLeft\|scrollTop\|scrollWidth\|style\|tabIndex\|title\)\>/
+    syntax match jsHtmlElemFuncs    contained /\%(blur\|click\|focus\|scrollIntoView\|addEventListener\|dispatchEvent\|removeEventListener\|item\)\>/ nextgroup=jsParen skipwhite
+
+    " CSS Styles in JavaScript
+    syntax keyword jsCssStyles      contained color font fontFamily fontSize fontSizeAdjust fontStretch fontStyle fontVariant fontWeight letterSpacing lineBreak lineHeight quotes rubyAlign rubyOverhang rubyPosition
+    syntax keyword jsCssStyles      contained textAlign textAlignLast textAutospace textDecoration textIndent textJustify textJustifyTrim textKashidaSpace textOverflowW6 textShadow textTransform textUnderlinePosition
+    syntax keyword jsCssStyles      contained unicodeBidi whiteSpace wordBreak wordSpacing wordWrap writingMode
+    syntax keyword jsCssStyles      contained bottom height left position right top width zIndex
+    syntax keyword jsCssStyles      contained border borderBottom borderLeft borderRight borderTop borderBottomColor borderLeftColor borderTopColor borderBottomStyle borderLeftStyle borderRightStyle borderTopStyle borderBottomWidth borderLeftWidth borderRightWidth borderTopWidth borderColor borderStyle borderWidth borderCollapse borderSpacing captionSide emptyCells tableLayout
+    syntax keyword jsCssStyles      contained margin marginBottom marginLeft marginRight marginTop outline outlineColor outlineStyle outlineWidth padding paddingBottom paddingLeft paddingRight paddingTop
+    syntax keyword jsCssStyles      contained listStyle listStyleImage listStylePosition listStyleType
+    syntax keyword jsCssStyles      contained background backgroundAttachment backgroundColor backgroundImage gackgroundPosition backgroundPositionX backgroundPositionY backgroundRepeat
+    syntax keyword jsCssStyles      contained clear clip clipBottom clipLeft clipRight clipTop content counterIncrement counterReset cssFloat cursor direction display filter layoutGrid layoutGridChar layoutGridLine layoutGridMode layoutGridType
+    syntax keyword jsCssStyles      contained marks maxHeight maxWidth minHeight minWidth opacity MozOpacity overflow overflowX overflowY verticalAlign visibility zoom cssText
+    syntax keyword jsCssStyles      contained scrollbar3dLightColor scrollbarArrowColor scrollbarBaseColor scrollbarDarkShadowColor scrollbarFaceColor scrollbarHighlightColor scrollbarShadowColor scrollbarTrackColor
+
+    " Highlight ways
+    syntax match jsDotNotation      "\." nextgroup=jsPrototype,jsDomElemAttrs,jsDomElemFuncs,jsHtmlElemAttrs,jsHtmlElemFuncs
+    syntax match jsDotNotation      "\.style\." nextgroup=jsCssStyles
+
+endif "DOM/HTML/CSS
+
+"" end DOM/HTML/CSS specified things
+
+
+"" Code blocks
+syntax cluster jsExpression contains=jsComment,jsLineComment,jsDocComment,jsTemplateString,jsStringD,jsStringS,jsRegexpString,jsNumber,jsFloat,jsThis,jsOperator,jsBooleanTrue,jsBooleanFalse,jsNull,jsFunction,jsArrowFunction,jsGlobalObjects,jsExceptions,jsFutureKeys,jsDomErrNo,jsDomNodeConsts,jsHtmlEvents,jsDotNotation,jsBracket,jsParen,jsBlock,jsFuncCall,jsUndefined,jsNan,jsKeyword,jsStorageClass,jsPrototype,jsBuiltins,jsNoise,jsCommonJS
+syntax cluster jsAll        contains=@jsExpression,jsLabel,jsConditional,jsRepeat,jsReturn,jsStatement,jsTernaryIf,jsException
+syntax region  jsBracket    matchgroup=jsBrackets     start="\[" end="\]" contains=@jsAll,jsParensErrB,jsParensErrC,jsBracket,jsParen,jsBlock,@htmlPreproc fold
+syntax region  jsParen      matchgroup=jsParens       start="("  end=")"  contains=@jsAll,jsParensErrA,jsParensErrC,jsParen,jsBracket,jsBlock,@htmlPreproc fold
+syntax region  jsBlock      matchgroup=jsBraces       start="{"  end="}"  contains=@jsAll,jsParensErrA,jsParensErrB,jsParen,jsBracket,jsBlock,jsObjectKey,@htmlPreproc fold
+syntax region  jsFuncBlock  matchgroup=jsFuncBraces   start="{"  end="}"  contains=@jsAll,jsParensErrA,jsParensErrB,jsParen,jsBracket,jsBlock,@htmlPreproc contained fold
+syntax region  jsTernaryIf  matchgroup=jsTernaryIfOperator start=+?+  end=+:+  contains=@jsExpression,jsTernaryIf
+
+"" catch errors caused by wrong parenthesis
+syntax match   jsParensError    ")\|}\|\]"
+syntax match   jsParensErrA     contained "\]"
+syntax match   jsParensErrB     contained ")"
+syntax match   jsParensErrC     contained "}"
+
+if main_syntax == "javascript"
+  syntax sync clear
+  syntax sync ccomment jsComment minlines=200
+  syntax sync match jsHighlight grouphere jsBlock /{/
+endif
+
+exe 'syntax match jsFunction /\<function\>/ nextgroup=jsFuncName,jsFuncArgs skipwhite '.(exists('g:javascript_conceal_function') ? 'conceal cchar='.g:javascript_conceal_function : '')
+
+syntax match   jsFuncName       contained /\<[a-zA-Z_$][0-9a-zA-Z_$]*/ nextgroup=jsFuncArgs skipwhite
+syntax region  jsFuncArgs       contained matchgroup=jsFuncParens start='(' end=')' contains=jsFuncArgCommas,jsFuncArgRest nextgroup=jsFuncBlock keepend skipwhite skipempty
+syntax match   jsFuncArgCommas  contained ','
+syntax match   jsFuncArgRest    contained /\%(\.\.\.[a-zA-Z_$][0-9a-zA-Z_$]*\))/
+syntax keyword jsArgsObj        arguments contained containedin=jsFuncBlock
+
+syntax match jsArrowFunction /=>/
+
+" Define the default highlighting.
+" For version 5.7 and earlier: only when not done already
+" For version 5.8 and later: only when an item doesn't have highlighting yet
+if version >= 508 || !exists("did_javascript_syn_inits")
+  if version < 508
+    let did_javascript_syn_inits = 1
+    command -nargs=+ HiLink hi link <args>
   else
-    let ols = s:ExitingOneLineScope(lnum)
-    while ols > 0 && ind > 0
-      let ind = ind - &sw
-      let ols = s:InOneLineScope(ols - 1)
-    endwhile
+    command -nargs=+ HiLink hi def link <args>
   endif
+  HiLink jsFuncArgRest          Special
+  HiLink jsComment              Comment
+  HiLink jsLineComment          Comment
+  HiLink jsEnvComment           PreProc
+  HiLink jsDocComment           Comment
+  HiLink jsCommentTodo          Todo
+  HiLink jsCvsTag               Function
+  HiLink jsDocTags              Special
+  HiLink jsDocSeeTag            Function
+  HiLink jsDocType              Type
+  HiLink jsDocTypeNoParam       Type
+  HiLink jsDocParam             Label
+  HiLink jsStringS              String
+  HiLink jsStringD              String
+  HiLink jsTemplateString       String
+  HiLink jsTernaryIfOperator    Conditional
+  HiLink jsRegexpString         String
+  HiLink jsRegexpBoundary       SpecialChar
+  HiLink jsRegexpQuantifier     SpecialChar
+  HiLink jsRegexpOr             Conditional
+  HiLink jsRegexpMod            SpecialChar
+  HiLink jsRegexpBackRef        SpecialChar
+  HiLink jsRegexpGroup          jsRegexpString
+  HiLink jsRegexpCharClass      Character
+  HiLink jsCharacter            Character
+  HiLink jsPrototype            Special
+  HiLink jsConditional          Conditional
+  HiLink jsBranch               Conditional
+  HiLink jsLabel                Label
+  HiLink jsReturn               Statement
+  HiLink jsRepeat               Repeat
+  HiLink jsStatement            Statement
+  HiLink jsException            Exception
+  HiLink jsKeyword              Keyword
+  HiLink jsArrowFunction        Type
+  HiLink jsFunction             Type
+  HiLink jsFuncName             Function
+  HiLink jsArgsObj              Special
+  HiLink jsError                Error
+  HiLink jsParensError          Error
+  HiLink jsParensErrA           Error
+  HiLink jsParensErrB           Error
+  HiLink jsParensErrC           Error
+  HiLink jsOperator             Operator
+  HiLink jsStorageClass         StorageClass
+  HiLink jsThis                 Special
+  HiLink jsNan                  Number
+  HiLink jsNull                 Type
+  HiLink jsUndefined            Type
+  HiLink jsNumber               Number
+  HiLink jsFloat                Float
+  HiLink jsBooleanTrue          Boolean
+  HiLink jsBooleanFalse         Boolean
+  HiLink jsNoise                Noise
+  HiLink jsBrackets             Noise
+  HiLink jsParens               Noise
+  HiLink jsBraces               Noise
+  HiLink jsFuncBraces           Noise
+  HiLink jsFuncParens           Noise
+  HiLink jsSpecial              Special
+  HiLink jsTemplateVar          Special
+  HiLink jsGlobalObjects        Special
+  HiLink jsExceptions           Special
+  HiLink jsFutureKeys           Special
+  HiLink jsBuiltins             Special
+  HiLink jsCommonJS             Include
 
-  return ind
-endfunction
+  HiLink jsDomErrNo             Constant
+  HiLink jsDomNodeConsts        Constant
+  HiLink jsDomElemAttrs         Label
+  HiLink jsDomElemFuncs         PreProc
 
-" }}}1
+  HiLink jsHtmlEvents           Special
+  HiLink jsHtmlElemAttrs        Label
+  HiLink jsHtmlElemFuncs        PreProc
 
-let &cpo = s:cpo_save
-unlet s:cpo_save
+  HiLink jsCssStyles            Label
+
+  delcommand HiLink
+endif
+
+" Define the htmlJavaScript for HTML syntax html.vim
+"syntax clear htmlJavaScript
+"syntax clear jsExpression
+syntax cluster  htmlJavaScript       contains=@jsAll,jsBracket,jsParen,jsBlock
+syntax cluster  javaScriptExpression contains=@jsAll,jsBracket,jsParen,jsBlock,@htmlPreproc
+" Vim's default html.vim highlights all javascript as 'Special'
+hi! def link javaScript              NONE
+
+let b:current_syntax = "javascript"
+if main_syntax == 'javascript'
+  unlet main_syntax
+endif

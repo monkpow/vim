@@ -81,9 +81,13 @@ vnoremap > >gv
 
 function! CleanJson()
   %s/\([{|}]\)/\r\1\r/g
+  %s/\(\[\)/[\r/g
+  %s/\(\]\)/\r]/g
   %s/\,/,\r/g
   %s/}\n,/},/g
-  %s/}\n\s*\n}/}\r}/g
+  "%s/}\n\s*\n}/}\r}/g
+  %s/^\s*$\n//
+  normal! ggVG=
   retab
 endfunction
 
@@ -92,13 +96,13 @@ colo 256_automation
 colo lucius
 "LuciusDark (dark default)
 "LuciusDarkHighContrast
-LuciusDarkLowContrast
+"LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
-"LuciusLight (light default)
+"LuciusLight "(light default)
 "LuciusLightLowContrast
-"LuciusWhite
+LuciusWhite
 "LuciusWhiteLowContrast
 
 
@@ -144,7 +148,7 @@ imap <right> <nop>
 " syntastic!
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_aggregate_errors = 1
-let g:syntastic_css_checkers = ['csslint', 'prettycss']
+let g:syntastic_css_checkers = ['csslint']
 
 " never mis-spell iOS again
 abbr ios iOS
