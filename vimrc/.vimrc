@@ -94,7 +94,7 @@ endfunction
 colo github
 colo 256_automation
 colo lucius
-"LuciusDark (dark default)
+LuciusDark "(dark default)
 "LuciusDarkHighContrast
 "LuciusDarkLowContrast
 "LuciusBlack
@@ -102,7 +102,7 @@ colo lucius
 "LuciusBlackLowContrast
 "LuciusLight "(light default)
 "LuciusLightLowContrast
-LuciusWhite
+"LuciusWhite
 "LuciusWhiteLowContrast
 
 
@@ -146,9 +146,10 @@ imap <left> <nop>
 imap <right> <nop>
 
 " syntastic!
-let g:syntastic_javascript_checkers = ['jshint']
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_css_checkers = ['csslint']
+let g:syntastic_javascript_checkers = ['jscs', 'jshint']
+"let g:syntastic_javascript_checkers = ['jshint', 'jscs']
+"let g:syntastic_aggregate_errors = 1
+"let g:syntastic_css_checkers = ['csslint']
 
 " never mis-spell iOS again
 abbr ios iOS
@@ -167,3 +168,14 @@ abbr IOS iOS
 ":%s/^\([^{]*\)}/\1\r}/g
 
 execute pathogen#infect()
+
+
+" recommended by syntastic, not sure I agree
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+
+"let g:syntastic_always_populate_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
+"let g:syntastic_check_on_open = 1
+"let g:syntastic_check_on_wq = 0
