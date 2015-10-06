@@ -96,7 +96,7 @@ colo 256_automation
 colo lucius
 LuciusDark "(dark default)
 "LuciusDarkHighContrast
-"LuciusDarkLowContrast
+LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
@@ -155,6 +155,10 @@ let g:syntastic_javascript_checkers = ['jscs', 'jshint']
 abbr ios iOS
 abbr iOs iOS
 abbr IOS iOS
+
+
+" alias for jira_client
+abbr !j !jira_client
 
 """""""""""""""""""""""""""""""""""""""""""""""""""
 " a few notes i want to remember
