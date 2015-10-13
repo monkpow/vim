@@ -102,7 +102,7 @@ LuciusDarkLowContrast
 "LuciusBlackLowContrast
 "LuciusLight "(light default)
 "LuciusLightLowContrast
-"LuciusWhite
+LuciusWhite
 "LuciusWhiteLowContrast
 
 
