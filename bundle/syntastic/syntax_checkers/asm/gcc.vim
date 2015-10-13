@@ -22,14 +22,14 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! SyntaxCheckers_asm_gcc_IsAvailable() dict " {{{1
+function! SyntaxCheckers_asm_gcc_IsAvailable() dict
     if !exists('g:syntastic_asm_compiler')
         let g:syntastic_asm_compiler = self.getExec()
     endif
-    return executable(expand(g:syntastic_asm_compiler, 1))
-endfunction " }}}1
+    return executable(expand(g:syntastic_asm_compiler))
+endfunction
 
-function! SyntaxCheckers_asm_gcc_GetLocList() dict " {{{1
+function! SyntaxCheckers_asm_gcc_GetLocList() dict
     return syntastic#c#GetLocList('asm', 'gcc', {
         \ 'errorformat':
         \     '%-G%f:%s:,' .
@@ -37,16 +37,12 @@ function! SyntaxCheckers_asm_gcc_GetLocList() dict " {{{1
         \     '%f:%l:%c: %tarning: %m,' .
         \     '%f:%l: %m',
         \ 'main_flags': '-x assembler -fsyntax-only -masm=' . s:GetDialect() })
-endfunction " }}}1
+endfunction
 
-" Utilities {{{1
-
-function! s:GetDialect() " {{{2
+function! s:GetDialect()
     return exists('g:syntastic_asm_dialect') ? g:syntastic_asm_dialect :
-        \ expand('%:e', 1) ==? 'asm' ? 'intel' : 'att'
-endfunction " }}}2
-
-" }}}1
+        \ expand('%:e') ==? 'asm' ? 'intel' : 'att'
+endfunction
 
 call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'filetype': 'asm',
@@ -55,4 +51,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

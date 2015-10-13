@@ -8,6 +8,11 @@
 "             Want To Public License, Version 2, as published by Sam Hocevar.
 "             See http://sam.zoy.org/wtfpl/COPYING for more details.
 "============================================================================
+"
+" Specify additional options to csslint with this option. e.g. to disable
+" warnings:
+"
+"   let g:syntastic_csslint_options = '--warnings=none'
 
 if exists('g:loaded_syntastic_css_csslint_checker')
     finish
@@ -33,7 +38,7 @@ function! SyntaxCheckers_css_csslint_GetLocList() dict
     return SyntasticMake({
         \ 'makeprg': makeprg,
         \ 'errorformat': errorformat,
-        \ 'defaults': {'bufnr': bufnr('')} })
+        \ 'defaults': {'bufnr': bufnr("")} })
 
 endfunction
 
@@ -44,4 +49,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

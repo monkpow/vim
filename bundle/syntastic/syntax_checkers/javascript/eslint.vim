@@ -14,18 +14,13 @@ if exists('g:loaded_syntastic_javascript_eslint_checker')
 endif
 let g:loaded_syntastic_javascript_eslint_checker = 1
 
-if !exists('g:syntastic_javascript_eslint_sort')
-    let g:syntastic_javascript_eslint_sort = 1
-endif
-
 let s:save_cpo = &cpo
 set cpo&vim
 
 function! SyntaxCheckers_javascript_eslint_IsAvailable() dict
-    if !executable(self.getExec())
-        return 0
-    endif
-    return syntastic#util#versionIsAtLeast(self.getVersion(), [0, 1])
+    return
+        \ executable(self.getExec()) &&
+        \ syntastic#util#versionIsAtLeast(syntastic#util#getVersion(self.getExecEscaped() . ' --version'), [0, 1])
 endfunction
 
 function! SyntaxCheckers_javascript_eslint_GetLocList() dict
@@ -47,6 +42,8 @@ function! SyntaxCheckers_javascript_eslint_GetLocList() dict
         let e['col'] += 1
     endfor
 
+    call self.setWantSort(1)
+
     return loclist
 endfunction
 
@@ -57,4 +54,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

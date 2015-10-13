@@ -10,7 +10,7 @@
 "
 "============================================================================
 
-if exists('g:loaded_syntastic_fortran_gfortran_checker')
+if exists("g:loaded_syntastic_fortran_gfortran_checker")
     finish
 endif
 let g:loaded_syntastic_fortran_gfortran_checker=1
@@ -26,8 +26,7 @@ function! SyntaxCheckers_fortran_gfortran_IsAvailable() dict
     if !exists('g:syntastic_fortran_compiler')
         let g:syntastic_fortran_compiler = self.getExec()
     endif
-    call self.log('g:syntastic_fortran_compiler = ', g:syntastic_fortran_compiler)
-    return executable(expand(g:syntastic_fortran_compiler, 1))
+    return executable(expand(g:syntastic_fortran_compiler))
 endfunction
 
 function! SyntaxCheckers_fortran_gfortran_GetLocList() dict
@@ -49,4 +48,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

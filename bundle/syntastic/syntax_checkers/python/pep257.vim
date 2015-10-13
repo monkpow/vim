@@ -2,6 +2,8 @@
 "File:        pep257.vim
 "Description: Docstring style checking plugin for syntastic.vim
 "============================================================================
+"
+" For details about pep257 see: https://github.com/GreenSteam/pep257
 
 if exists('g:loaded_syntastic_python_pep257_checker')
     finish
@@ -13,7 +15,8 @@ set cpo&vim
 
 function! SyntaxCheckers_python_pep257_GetLocList() dict
     if !exists('s:pep257_new')
-        let s:pep257_new = syntastic#util#versionIsAtLeast(self.getVersion(), [0, 3])
+        let s:pep257_new = syntastic#util#versionIsAtLeast(syntastic#util#getVersion(
+            \ self.getExecEscaped() . ' --version'), [0, 3])
     endif
 
     let makeprg = self.makeprgBuild({})
@@ -56,4 +59,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:
