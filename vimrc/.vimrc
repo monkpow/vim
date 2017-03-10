@@ -96,13 +96,13 @@ colo 256_automation
 colo lucius
 "LuciusDark (dark default)
 "LuciusDarkHighContrast
-LuciusDarkLowContrast
-"LuciusBlack
+"LuciusDarkLowContrast
+LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
 "LuciusLight "(light default)
 "LuciusLightLowContrast
-LuciusWhite
+"LuciusWhite
 "LuciusWhiteLowContrast
 
 
@@ -132,7 +132,7 @@ autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
 autocmd Syntax * syn match HashRocketNO /=>/
 
 " highlight lines longer than 120 chars
-highlight OverLength ctermbg=darkred ctermfg=white guibg=#FFD9D9
+highlight OverLength ctermbg=darkblue ctermfg=white guibg=#FFD9D9
 match OverLength /\%121v.*/
 
 " disable arrow keys
@@ -146,7 +146,7 @@ imap <left> <nop>
 imap <right> <nop>
 
 " syntastic!
-let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_javascript_checkers = ['jscs', 'jshint', 'jscs']
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_css_checkers = ['csslint']
 
