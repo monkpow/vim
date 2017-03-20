@@ -1,3 +1,6 @@
 [submodule "/Users/nik/.vim/pack/monkpow/start/vim-airline"]
 	path = /Users/nik/.vim/pack/monkpow/start/vim-airline
 	url = https://github.com/vim-airline/vim-airline.git
+[submodule "pack/monkpow/start/syntastic"]
+	path = pack/monkpow/start/syntastic
+	url = https://github.com/vim-syntastic/syntastic
