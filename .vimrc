@@ -122,7 +122,7 @@ set backupskip=/tmp/*,/private/tmp/*"
 set dir=/tmp
 
 "disable jslint line highlighting, because it is annoying me
-"let g:JSLintHighlightErrorLine = 0
+let g:JSLintHighlightErrorLine = 0
 
 " Attempt to highlight extra whitespace and bad formatting
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
