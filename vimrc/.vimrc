@@ -170,4 +170,4 @@ abbr !j !jira_client
 "nmap ,z :%s/{\([^}]*\)$/{\r\1/g
 ":%s/^\([^{]*\)}/\1\r}/g
 
-execute pathogen#infect()
+"execute pathogen#infect()
