@@ -1,5 +1,0 @@
-assert(!Element.hasClassName($('ac_update_br').firstChild.firstChild),'Item shouldn\'t have a className of: selected');
-assertEqual('(GET <ME> INSTEAD)',$('ac_input').value);
-assertInstanceOf(Ajax.Autocompleter, ac);
-assertNotVisible('ac_update');
-assertVisible('ac2_update');

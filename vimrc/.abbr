@@ -1,13 +1,0 @@
-abbr start_project <project name="presentation" default="test" basedir="."><target name="test" ><echo>working</echo></target></project>
-
-abbr task_check_css <property name="jigsaw.home"    value="${basedir}/test/css-validator/"/><target name="check_css" ><exec executable="${jigsaw.home}/check_css.rb" dir="${jigsaw.home}" failonerror="true" ><arg value="${basedir}/src/css/*.css" /></exec></target>
-
-
-abbr task_check_js   <property name="jslint.home"    value="${basedir}/test/jslint/" /><target name="check_js" ><exec executable="${jslint.home}/check_js.rb" dir="${jslint.home}" failonerror="true" ><arg value="${basedir}/src/js/*.js" /></exec></target>
-
-abbr task_check_jsp <property name="jspchecker.home" value="${basedir}/test/checker" /><target name="check_jsp" ><exec executable="${jspchecker.home}/check_jsp.rb" dir="${jspchecker.home}" failonerror="true" ><arg value="${basedir}/src/jsp/bad_scope.jsp" /></exec></target>
-
-
-abbr catch_fonts catchError("Never use font tags", line) if line.match(/<font/)
-abbr catch_styles catchError("Don't use inline styles", line) if line.match(/style\s*=\s*"/)
-abbr task_finder <property name="finder.home" value="${basedir}/test/finder" /><target name="check_imports" ><exec executable="${finder.home}/brokenImports.rb" dir="${jspchecker.home}" failonerror="true" ><arg value="${basedir}/src/jsp/broken_import.jsp" /></exec></target>

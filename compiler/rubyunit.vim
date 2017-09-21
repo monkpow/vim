@@ -1,9 +1,7 @@
 " Vim compiler file
 " Language:		Test::Unit - Ruby Unit Testing Framework
 " Maintainer:		Doug Kearns <dougkearns@gmail.com>
-" Info:			$Id: rubyunit.vim,v 1.11 2006/04/15 12:01:18 dkearns Exp $
-" URL:			http://vim-ruby.rubyforge.org
-" Anon CVS:		See above site
+" URL:			https://github.com/vim-ruby/vim-ruby
 " Release Coordinator:	Doug Kearns <dougkearns@gmail.com>
 
 if exists("current_compiler")
@@ -19,6 +17,8 @@ let s:cpo_save = &cpo
 set cpo-=C
 
 CompilerSet makeprg=testrb
+" CompilerSet makeprg=ruby\ -Itest
+" CompilerSet makeprg=m
 
 CompilerSet errorformat=\%W\ %\\+%\\d%\\+)\ Failure:,
 			\%C%m\ [%f:%l]:,
@@ -32,4 +32,4 @@ CompilerSet errorformat=\%W\ %\\+%\\d%\\+)\ Failure:,
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-" vim: nowrap sw=2 sts=2 ts=8 ff=unix:
+" vim: nowrap sw=2 sts=2 ts=8:

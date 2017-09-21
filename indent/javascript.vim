@@ -1,309 +1,449 @@
-" Vim syntax file
-" Language:     JavaScript
-" Maintainer:   vim-javascript community
-" URL:          https://github.com/pangloss/vim-javascript
+" Vim indent file
+" Language: Javascript
+" Maintainer: Chris Paul ( https://github.com/bounceme )
+" URL: https://github.com/pangloss/vim-javascript
+" Last Change: September 18, 2017
 
-if !exists("main_syntax")
-  if version < 600
-    syntax clear
-  elseif exists("b:current_syntax")
-    finish
+" Only load this indent file when no other was loaded.
+if exists('b:did_indent')
+  finish
+endif
+let b:did_indent = 1
+
+" indent correctly if inside <script>
+" vim/vim@690afe1 for the switch from cindent
+let b:html_indent_script1 = 'inc'
+
+" Now, set up our indentation expression and keys that trigger it.
+setlocal indentexpr=GetJavascriptIndent()
+setlocal autoindent nolisp nosmartindent
+setlocal indentkeys+=0],0)
+" Testable with something like:
+" vim  -eNs "+filetype plugin indent on" "+syntax on" "+set ft=javascript" \
+"       "+norm! gg=G" '+%print' '+:q!' testfile.js \
+"       | diff -uBZ testfile.js -
+
+let b:undo_indent = 'setlocal indentexpr< smartindent< autoindent< indentkeys<'
+
+" Regex of syntax group names that are or delimit string or are comments.
+let b:syng_strcom = get(b:,'syng_strcom','string\|comment\|regex\|special\|doc\|template\%(braces\)\@!')
+let b:syng_str = get(b:,'syng_str','string\|template\|special')
+" template strings may want to be excluded when editing graphql:
+" au! Filetype javascript let b:syng_str = '^\%(.*template\)\@!.*string\|special'
+" au! Filetype javascript let b:syng_strcom = '^\%(.*template\)\@!.*string\|comment\|regex\|special\|doc'
+
+" Only define the function once.
+if exists('*GetJavascriptIndent')
+  finish
+endif
+
+let s:cpo_save = &cpo
+set cpo&vim
+
+" Get shiftwidth value
+if exists('*shiftwidth')
+  function s:sw()
+    return shiftwidth()
+  endfunction
+else
+  function s:sw()
+    return &l:shiftwidth ? &l:shiftwidth : &l:tabstop
+  endfunction
+endif
+
+" Performance for forwards search(): start search at pos rather than masking
+" matches before pos.
+let s:z = has('patch-7.4.984') ? 'z' : ''
+
+" Expression used to check whether we should skip a match with searchpair().
+let s:skip_expr = "s:SynAt(line('.'),col('.')) =~? b:syng_strcom"
+let s:in_comm = s:skip_expr[:-14] . "'comment\\|doc'"
+
+let s:rel = has('reltime')
+" searchpair() wrapper
+if s:rel
+  function s:GetPair(start,end,flags,skip)
+    return searchpair('\m'.a:start,'','\m'.a:end,a:flags,a:skip,s:l1,a:skip ==# 's:SkipFunc()' ? 2000 : 200)
+  endfunction
+else
+  function s:GetPair(start,end,flags,skip)
+    return searchpair('\m'.a:start,'','\m'.a:end,a:flags,a:skip,s:l1)
+  endfunction
+endif
+
+function s:SynAt(l,c)
+  let byte = line2byte(a:l) + a:c - 1
+  let pos = index(s:synid_cache[0], byte)
+  if pos == -1
+    let s:synid_cache[:] += [[byte], [synIDattr(synID(a:l, a:c, 0), 'name')]]
   endif
-  let main_syntax = 'javascript'
-endif
+  return s:synid_cache[1][pos]
+endfunction
 
-if !exists('g:javascript_conceal')
-  let g:javascript_conceal = 0
-endif
+function s:ParseCino(f)
+  let [divider, n, cstr] = [0] + matchlist(&cino,
+        \ '\%(.*,\)\=\%(\%d'.char2nr(a:f).'\(-\)\=\([.s0-9]*\)\)\=')[1:2]
+  for c in split(cstr,'\zs')
+    if c == '.' && !divider
+      let divider = 1
+    elseif c ==# 's'
+      if n !~ '\d'
+        return n . s:sw() + 0
+      endif
+      let n = str2nr(n) * s:sw()
+      break
+    else
+      let [n, divider] .= [c, 0]
+    endif
+  endfor
+  return str2nr(n) / max([str2nr(divider),1])
+endfunction
 
-"" Drop fold if it is set but VIM doesn't support it.
-let b:javascript_fold='true'
-if version < 600    " Don't support the old version
-  unlet! b:javascript_fold
-endif
+" Optimized {skip} expr, only callable from the search loop which
+" GetJavascriptIndent does to find the containing [[{(] (side-effects)
+function s:SkipFunc()
+  if s:top_col == 1
+    throw 'out of bounds'
+  endif
+  let s:top_col = 0
+  if s:check_in
+    if eval(s:skip_expr)
+      return 1
+    endif
+    let s:check_in = 0
+  elseif getline('.') =~ '\%<'.col('.').'c\/.\{-}\/\|\%>'.col('.').'c[''"]\|\\$'
+    if eval(s:skip_expr)
+      let s:looksyn = a:firstline
+      return 1
+    endif
+  elseif search('\m`\|\${\|\*\/','nW'.s:z,s:looksyn) && eval(s:skip_expr)
+    let s:check_in = 1
+    return 1
+  endif
+  let [s:looksyn, s:top_col] = getpos('.')[1:2]
+endfunction
 
-"" dollar sign is permittd anywhere in an identifier
-setlocal iskeyword+=$
+function s:AlternatePair()
+  let [pat, l:for] = ['[][(){};]', 2]
+  while s:SearchLoop(pat,'bW','s:SkipFunc()')
+    if s:LookingAt() == ';'
+      if !l:for
+        if s:GetPair('{','}','bW','s:SkipFunc()')
+          return
+        endif
+        break
+      else
+        let [pat, l:for] = ['[{}();]', l:for - 1]
+      endif
+    else
+      let idx = stridx('])}',s:LookingAt())
+      if idx == -1
+        return
+      elseif !s:GetPair(['\[','(','{'][idx],'])}'[idx],'bW','s:SkipFunc()')
+        break
+      endif
+    endif
+  endwhile
+  throw 'out of bounds'
+endfunction
 
-syntax sync fromstart
+function s:Nat(int)
+  return a:int * (a:int > 0)
+endfunction
 
-syntax match   jsNoise           /\%(:\|,\|\;\|\.\)/
+function s:LookingAt()
+  return getline('.')[col('.')-1]
+endfunction
 
-"" Program Keywords
-syntax keyword jsStorageClass   const var let
-syntax keyword jsOperator       delete instanceof typeof void new in
-syntax match   jsOperator       /\(!\||\|&\|+\|-\|<\|>\|=\|%\|\/\|*\|\~\|\^\)/
-syntax keyword jsBooleanTrue    true
-syntax keyword jsBooleanFalse   false
-syntax keyword jsCommonJS       require module exports
+function s:Token()
+  return s:LookingAt() =~ '\k' ? expand('<cword>') : s:LookingAt()
+endfunction
 
-"" JavaScript comments
-syntax keyword jsCommentTodo    TODO FIXME XXX TBD contained
-syntax region  jsLineComment    start=+\/\/+ end=+$+ keepend contains=jsCommentTodo,@Spell
-syntax region  jsEnvComment     start="\%^#!" end="$" display
-syntax region  jsLineComment    start=+^\s*\/\/+ skip=+\n\s*\/\/+ end=+$+ keepend contains=jsCommentTodo,@Spell fold
-syntax region  jsCvsTag         start="\$\cid:" end="\$" oneline contained
-syntax region  jsComment        start="/\*"  end="\*/" contains=jsCommentTodo,jsCvsTag,@Spell fold
+function s:PreviousToken()
+  let l:col = col('.')
+  if search('\m\k\{1,}\|\S','ebW')
+    if search('\m\*\%#\/\|\/\/\%<'.a:firstline.'l','nbW',line('.')) && eval(s:in_comm)
+      if s:SearchLoop('\S\ze\_s*\/[/*]','bW',s:in_comm)
+        return s:Token()
+      endif
+      call cursor(a:firstline, l:col)
+    else
+      return s:Token()
+    endif
+  endif
+  return ''
+endfunction
 
-"" JSDoc / JSDoc Toolkit
-if !exists("javascript_ignore_javaScriptdoc")
-  syntax case ignore
+function s:Pure(f,...)
+  return eval("[call(a:f,a:000),cursor(a:firstline,".col('.').")][0]")
+endfunction
 
-  "" syntax coloring for javadoc comments (HTML)
-  "syntax include @javaHtml <sfile>:p:h/html.vim
-  "unlet b:current_syntax
+function s:SearchLoop(pat,flags,expr)
+  return s:GetPair(a:pat,'\_$.',a:flags,a:expr)
+endfunction
 
-  syntax region jsDocComment      matchgroup=jsComment start="/\*\*\s*"  end="\*/" contains=jsDocTags,jsCommentTodo,jsCvsTag,@jsHtml,@Spell fold
+function s:ExprCol()
+  let bal = 0
+  while s:SearchLoop('[{}?]\|\_[^:]\zs::\@!','bW',s:skip_expr)
+    if s:LookingAt() == ':'
+      let bal -= 1
+    elseif s:LookingAt() == '?'
+      let bal += 1
+      if bal == 1
+        break
+      endif
+    elseif s:LookingAt() == '{'
+      let bal = !s:IsBlock()
+      break
+    elseif !s:GetPair('{','}','bW',s:skip_expr)
+      break
+    endif
+  endwhile
+  return s:Nat(bal)
+endfunction
 
-  " tags containing a param
-  syntax match  jsDocTags         contained "@\(alias\|augments\|borrows\|class\|constructs\|default\|defaultvalue\|emits\|exception\|exports\|extends\|file\|fires\|kind\|listens\|member\|member[oO]f\|mixes\|module\|name\|namespace\|requires\|template\|throws\|var\|variation\|version\)\>" nextgroup=jsDocParam skipwhite
-  " tags containing type and param
-  syntax match  jsDocTags         contained "@\(arg\|argument\|param\|property\)\>" nextgroup=jsDocType skipwhite
-  " tags containing type but no param
-  syntax match  jsDocTags         contained "@\(callback\|define\|enum\|external\|implements\|this\|type\|typedef\|return\|returns\)\>" nextgroup=jsDocTypeNoParam skipwhite
-  " tags containing references
-  syntax match  jsDocTags         contained "@\(lends\|see\|tutorial\)\>" nextgroup=jsDocSeeTag skipwhite
-  " other tags (no extra syntax)
-  syntax match  jsDocTags         contained "@\(abstract\|access\|author\|classdesc\|constant\|const\|constructor\|copyright\|deprecated\|desc\|description\|dict\|event\|example\|file[oO]verview\|final\|function\|global\|ignore\|inheritDoc\|inner\|instance\|interface\|license\|method\|mixin\|nosideeffects\|override\|overview\|preserve\|private\|protected\|public\|readonly\|since\|static\|struct\|todo\|summary\|undocumented\|virtual\)\>"
+" configurable regexes that define continuation lines, not including (, {, or [.
+let s:opfirst = '^' . get(g:,'javascript_opfirst',
+      \ '\C\%([<>=,.?^%|/&]\|\([-:+]\)\1\@!\|\*\+\|!=\|in\%(stanceof\)\=\>\)')
+let s:continuation = get(g:,'javascript_continuation',
+      \ '\C\%([<=,.~!?/*^%|&:]\|+\@<!+\|-\@<!-\|=\@<!>\|\<\%(typeof\|new\|delete\|void\|in\|instanceof\|await\)\)') . '$'
 
-  syntax region jsDocType         start="{" end="}" oneline contained nextgroup=jsDocParam skipwhite
-  syntax match  jsDocType         contained "\%(#\|\"\|\w\|\.\|:\|\/\)\+" nextgroup=jsDocParam skipwhite
-  syntax region jsDocTypeNoParam  start="{" end="}" oneline contained
-  syntax match  jsDocTypeNoParam  contained "\%(#\|\"\|\w\|\.\|:\|\/\)\+"
-  syntax match  jsDocParam        contained "\%(#\|\"\|{\|}\|\w\|\.\|:\|\/\)\+"
-  syntax region jsDocSeeTag       contained matchgroup=jsDocSeeTag start="{" end="}" contains=jsDocTags
+function s:Continues(ln,con)
+  let tok = matchstr(a:con[-15:],s:continuation)
+  if tok =~ '[a-z:]'
+    call cursor(a:ln, len(a:con))
+    return tok == ':' ? s:ExprCol() : s:PreviousToken() != '.'
+  elseif tok !~ '[/>]'
+    return tok isnot ''
+  endif
+  return s:SynAt(a:ln, len(a:con)) !~? (tok == '>' ? 'jsflow\|^html' : 'regex')
+endfunction
 
-  syntax case match
-endif   "" JSDoc end
+" Check if line 'lnum' has a balanced amount of parentheses.
+function s:Balanced(lnum)
+  let [l:open, l:line] = [0, getline(a:lnum)]
+  let pos = match(l:line, '[][(){}]')
+  while pos != -1
+    if s:SynAt(a:lnum,pos + 1) !~? b:syng_strcom
+      let l:open += match(' ' . l:line[pos],'[[({]')
+      if l:open < 0
+        return
+      endif
+    endif
+    let pos = match(l:line, !l:open ? '[][(){}]' : '()' =~ l:line[pos] ?
+          \ '[()]' : '{}' =~ l:line[pos] ? '[{}]' : '[][]', pos + 1)
+  endwhile
+  return !l:open
+endfunction
 
-syntax case match
+function s:OneScope()
+  if s:LookingAt() == ')' && s:GetPair('(', ')', 'bW', s:skip_expr)
+    let tok = s:PreviousToken()
+    return (count(split('for if let while with'),tok) ||
+          \ tok =~# '^await$\|^each$' && s:PreviousToken() ==# 'for') &&
+          \ s:Pure('s:PreviousToken') != '.' && !(tok == 'while' && s:DoWhile())
+  elseif s:Token() =~# '^else$\|^do$'
+    return s:Pure('s:PreviousToken') != '.'
+  endif
+  return strpart(getline('.'),col('.')-2,2) == '=>'
+endfunction
 
-"" Syntax in the JavaScript code
-syntax match   jsFuncCall        /\k\+\%(\s*(\)\@=/
-syntax match   jsSpecial         "\v\\%(0|\\x\x\{2\}\|\\u\x\{4\}\|\c[A-Z]|.)" contained
-syntax match   jsTemplateVar     "\${.\{-}}" contained
-syntax region  jsStringD         start=+"+  skip=+\\\("\|$\)+  end=+"\|$+  contains=jsSpecial,@htmlPreproc,@Spell
-syntax region  jsStringS         start=+'+  skip=+\\\('\|$\)+  end=+'\|$+  contains=jsSpecial,@htmlPreproc,@Spell
-syntax region  jsTemplateString  start=+`+  skip=+\\\(`\|$\)+  end=+`\|$+  contains=jsTemplateVar,jsSpecial,@htmlPreproc
-syntax region  jsRegexpCharClass start=+\[+ skip=+\\.+ end=+\]+ contained
-syntax match   jsRegexpBoundary   "\v%(\<@![\^$]|\\[bB])" contained
-syntax match   jsRegexpBackRef   "\v\\[1-9][0-9]*" contained
-syntax match   jsRegexpQuantifier "\v\\@<!%([?*+]|\{\d+%(,|,\d+)?})\??" contained
-syntax match   jsRegexpOr        "\v\<@!\|" contained
-syntax match   jsRegexpMod       "\v\(@<=\?[:=!>]" contained
-syntax cluster jsRegexpSpecial   contains=jsSpecial,jsRegexpBoundary,jsRegexpBackRef,jsRegexpQuantifier,jsRegexpOr,jsRegexpMod
-syntax region  jsRegexpGroup     start="\\\@<!(" skip="\\.\|\[\(\\.\|[^]]\)*\]" end="\\\@<!)" contained contains=jsRegexpCharClass,@jsRegexpSpecial keepend
-syntax region  jsRegexpString    start=+\(\(\(return\|case\)\s\+\)\@<=\|\(\([)\]"']\|\d\|\w\)\s*\)\@<!\)/\(\*\|/\)\@!+ skip=+\\.\|\[\(\\.\|[^]]\)*\]+ end=+/[gimy]\{,4}+ contains=jsRegexpCharClass,jsRegexpGroup,@jsRegexpSpecial,@htmlPreproc oneline keepend
-syntax match   jsNumber          /\<-\=\d\+L\=\>\|\<0[xX]\x\+\>/
-syntax keyword jsNumber          Infinity
-syntax match   jsFloat           /\<-\=\%(\d\+\.\d\+\|\d\+\.\|\.\d\+\)\%([eE][+-]\=\d\+\)\=\>/
-syntax match   jsObjectKey       /\<[a-zA-Z_$][0-9a-zA-Z_$]*\(\s*:\)\@=/ contains=jsFunctionKey contained
-syntax match   jsFunctionKey     /\<[a-zA-Z_$][0-9a-zA-Z_$]*\(\s*:\s*function\s*\)\@=/ contained
+function s:DoWhile()
+  let cpos = searchpos('\m\<','cbW')
+  if s:SearchLoop('\C[{}]\|\<\%(do\|while\)\>','bW',s:skip_expr)
+    if s:{s:LookingAt() == '}' && s:GetPair('{','}','bW',s:skip_expr) ?
+          \ 'Previous' : ''}Token() ==# 'do' && s:IsBlock()
+      return 1
+    endif
+    call call('cursor',cpos)
+  endif
+endfunction
 
-exe 'syntax keyword jsNull      null      '.(exists('g:javascript_conceal_null')        ? 'conceal cchar='.g:javascript_conceal_null        : '')
-exe 'syntax keyword jsReturn    return    '.(exists('g:javascript_conceal_return')      ? 'conceal cchar='.g:javascript_conceal_return      : '')
-exe 'syntax keyword jsUndefined undefined '.(exists('g:javascript_conceal_undefined')   ? 'conceal cchar='.g:javascript_conceal_undefined   : '')
-exe 'syntax keyword jsNan       NaN       '.(exists('g:javascript_conceal_NaN')         ? 'conceal cchar='.g:javascript_conceal_NaN         : '')
-exe 'syntax keyword jsPrototype prototype '.(exists('g:javascript_conceal_prototype')   ? 'conceal cchar='.g:javascript_conceal_prototype   : '')
-exe 'syntax keyword jsThis      this      '.(exists('g:javascript_conceal_this')        ? 'conceal cchar='.g:javascript_conceal_this        : '')
+" returns total offset from braceless contexts. 'num' is the lineNr which
+" encloses the entire context, 'cont' if whether a:firstline is a continued
+" expression, which could have started in a braceless context
+function s:IsContOne(num,cont)
+  let [l:num, b_l] = [a:num + !a:num, 0]
+  let pind = a:num ? indent(a:num) + s:sw() : 0
+  let ind = indent('.') + !a:cont
+  while line('.') > l:num && ind > pind || line('.') == l:num
+    if indent('.') < ind && s:OneScope()
+      let b_l += 1
+    elseif !a:cont || b_l || ind < indent(a:firstline)
+      break
+    else
+      call cursor(0,1)
+    endif
+    let ind = min([ind, indent('.')])
+    if s:PreviousToken() is ''
+      break
+    endif
+  endwhile
+  return b_l
+endfunction
 
-"" Statement Keywords
-syntax keyword jsStatement      break continue with
-syntax keyword jsConditional    if else switch
-syntax keyword jsRepeat         do while for
-syntax keyword jsLabel          case default
-syntax keyword jsKeyword        yield import export default extends class
-syntax keyword jsException      try catch throw finally
+function s:Class()
+  return (s:Token() ==# 'class' || s:PreviousToken() =~# '^class$\|^extends$') &&
+        \ s:PreviousToken() != '.'
+endfunction
 
-syntax keyword jsGlobalObjects   Array Boolean Date Function Iterator Number Object RegExp String Proxy ParallelArray ArrayBuffer DataView Float32Array Float64Array Int16Array Int32Array Int8Array Uint16Array Uint32Array Uint8Array Uint8ClampedArray Intl JSON Math console document window
-syntax match   jsGlobalObjects  /\%(Intl\.\)\@<=\(Collator\|DateTimeFormat\|NumberFormat\)/
+function s:IsSwitch()
+  return s:PreviousToken() !~ '[.*]' &&
+        \ (!s:GetPair('{','}','cbW',s:skip_expr) || s:IsBlock() && !s:Class())
+endfunction
 
-syntax keyword jsExceptions     Error EvalError InternalError RangeError ReferenceError StopIteration SyntaxError TypeError URIError
+" https://github.com/sweet-js/sweet.js/wiki/design#give-lookbehind-to-the-reader
+function s:IsBlock()
+  let tok = s:PreviousToken()
+  if join(s:stack) =~? 'xml\|jsx' && s:SynAt(line('.'),col('.')-1) =~? 'xml\|jsx'
+    return tok != '{'
+  elseif tok =~ '\k'
+    if tok ==# 'type'
+      return s:Pure('eval',"s:PreviousToken() !~# '^\\%(im\\|ex\\)port$' || s:PreviousToken() == '.'")
+    elseif tok ==# 'of'
+      return s:Pure('eval',"!s:GetPair('[[({]','[])}]','bW',s:skip_expr) || s:LookingAt() != '(' ||"
+            \ ."s:{s:PreviousToken() ==# 'await' ? 'Previous' : ''}Token() !=# 'for' || s:PreviousToken() == '.'")
+    endif
+    return index(split('return const let import export extends yield default delete var await void typeof throw case new in instanceof')
+          \ ,tok) < (line('.') != a:firstline) || s:Pure('s:PreviousToken') == '.'
+  elseif tok == '>'
+    return getline('.')[col('.')-2] == '=' || s:SynAt(line('.'),col('.')) =~? 'jsflow\|^html'
+  elseif tok == '*'
+    return s:Pure('s:PreviousToken') == ':'
+  elseif tok == ':'
+    return s:Pure('eval',"s:PreviousToken() =~ '^\\K\\k*$' && !s:ExprCol()")
+  elseif tok == '/'
+    return s:SynAt(line('.'),col('.')) =~? 'regex'
+  elseif tok !~ '[=~!<,.?^%|&([]'
+    return tok !~ '[-+]' || line('.') != a:firstline && getline('.')[col('.')-2] == tok
+  endif
+endfunction
 
-syntax keyword jsBuiltins       decodeURI decodeURIComponent encodeURI encodeURIComponent eval isFinite isNaN parseFloat parseInt uneval
+function GetJavascriptIndent()
+  let b:js_cache = get(b:,'js_cache',[0,0,0])
+  let s:synid_cache = [[],[]]
+  let l:line = getline(v:lnum)
+  " use synstack as it validates syn state and works in an empty line
+  let s:stack = [''] + map(synstack(v:lnum,1),"synIDattr(v:val,'name')")
 
-syntax keyword jsFutureKeys     abstract enum int short boolean interface static byte long super char final native synchronized float package throws goto private transient debugger implements protected volatile double public
+  " start with strings,comments,etc.
+  if s:stack[-1] =~? 'comment\|doc'
+    if l:line =~ '^\s*\*'
+      return cindent(v:lnum)
+    elseif l:line !~ '^\s*\/[/*]'
+      return -1
+    endif
+  elseif s:stack[-1] =~? b:syng_str
+    if b:js_cache[0] == v:lnum - 1 && s:Balanced(v:lnum-1)
+      let b:js_cache[0] = v:lnum
+    endif
+    return -1
+  endif
 
-"" DOM/HTML/CSS specified things
+  let s:l1 = max([0,prevnonblank(v:lnum) - (s:rel ? 2000 : 1000),
+        \ get(get(b:,'hi_indent',{}),'blocklnr')])
+  call cursor(v:lnum,1)
+  if s:PreviousToken() is ''
+    return
+  endif
+  let [l:lnum, pline] = [line('.'), getline('.')[:col('.')-1]]
 
-" DOM2 Objects
-syntax keyword jsGlobalObjects  DOMImplementation DocumentFragment Document Node NodeList NamedNodeMap CharacterData Attr Element Text Comment CDATASection DocumentType Notation Entity EntityReference ProcessingInstruction
-syntax keyword jsExceptions     DOMException
+  let l:line = substitute(l:line,'^\s*','','')
+  let l:line_raw = l:line
+  if l:line[:1] == '/*'
+    let l:line = substitute(l:line,'^\%(\/\*.\{-}\*\/\s*\)*','','')
+  endif
+  if l:line =~ '^\/[/*]'
+    let l:line = ''
+  endif
 
-" DOM2 CONSTANT
-syntax keyword jsDomErrNo       INDEX_SIZE_ERR DOMSTRING_SIZE_ERR HIERARCHY_REQUEST_ERR WRONG_DOCUMENT_ERR INVALID_CHARACTER_ERR NO_DATA_ALLOWED_ERR NO_MODIFICATION_ALLOWED_ERR NOT_FOUND_ERR NOT_SUPPORTED_ERR INUSE_ATTRIBUTE_ERR INVALID_STATE_ERR SYNTAX_ERR INVALID_MODIFICATION_ERR NAMESPACE_ERR INVALID_ACCESS_ERR
-syntax keyword jsDomNodeConsts  ELEMENT_NODE ATTRIBUTE_NODE TEXT_NODE CDATA_SECTION_NODE ENTITY_REFERENCE_NODE ENTITY_NODE PROCESSING_INSTRUCTION_NODE COMMENT_NODE DOCUMENT_NODE DOCUMENT_TYPE_NODE DOCUMENT_FRAGMENT_NODE NOTATION_NODE
-
-" HTML events and internal variables
-syntax case ignore
-syntax keyword jsHtmlEvents     onblur onclick oncontextmenu ondblclick onfocus onkeydown onkeypress onkeyup onmousedown onmousemove onmouseout onmouseover onmouseup onresize
-syntax case match
-
-" Follow stuff should be highligh within a special context
-" While it can't be handled with context depended with Regex based highlight
-" So, turn it off by default
-if exists("javascript_enable_domhtmlcss")
-
-    " DOM2 things
-    syntax match jsDomElemAttrs     contained /\%(nodeName\|nodeValue\|nodeType\|parentNode\|childNodes\|firstChild\|lastChild\|previousSibling\|nextSibling\|attributes\|ownerDocument\|namespaceURI\|prefix\|localName\|tagName\)\>/
-    syntax match jsDomElemFuncs     contained /\%(insertBefore\|replaceChild\|removeChild\|appendChild\|hasChildNodes\|cloneNode\|normalize\|isSupported\|hasAttributes\|getAttribute\|setAttribute\|removeAttribute\|getAttributeNode\|setAttributeNode\|removeAttributeNode\|getElementsByTagName\|getAttributeNS\|setAttributeNS\|removeAttributeNS\|getAttributeNodeNS\|setAttributeNodeNS\|getElementsByTagNameNS\|hasAttribute\|hasAttributeNS\)\>/ nextgroup=jsParen skipwhite
-    " HTML things
-    syntax match jsHtmlElemAttrs    contained /\%(className\|clientHeight\|clientLeft\|clientTop\|clientWidth\|dir\|id\|innerHTML\|lang\|length\|offsetHeight\|offsetLeft\|offsetParent\|offsetTop\|offsetWidth\|scrollHeight\|scrollLeft\|scrollTop\|scrollWidth\|style\|tabIndex\|title\)\>/
-    syntax match jsHtmlElemFuncs    contained /\%(blur\|click\|focus\|scrollIntoView\|addEventListener\|dispatchEvent\|removeEventListener\|item\)\>/ nextgroup=jsParen skipwhite
-
-    " CSS Styles in JavaScript
-    syntax keyword jsCssStyles      contained color font fontFamily fontSize fontSizeAdjust fontStretch fontStyle fontVariant fontWeight letterSpacing lineBreak lineHeight quotes rubyAlign rubyOverhang rubyPosition
-    syntax keyword jsCssStyles      contained textAlign textAlignLast textAutospace textDecoration textIndent textJustify textJustifyTrim textKashidaSpace textOverflowW6 textShadow textTransform textUnderlinePosition
-    syntax keyword jsCssStyles      contained unicodeBidi whiteSpace wordBreak wordSpacing wordWrap writingMode
-    syntax keyword jsCssStyles      contained bottom height left position right top width zIndex
-    syntax keyword jsCssStyles      contained border borderBottom borderLeft borderRight borderTop borderBottomColor borderLeftColor borderTopColor borderBottomStyle borderLeftStyle borderRightStyle borderTopStyle borderBottomWidth borderLeftWidth borderRightWidth borderTopWidth borderColor borderStyle borderWidth borderCollapse borderSpacing captionSide emptyCells tableLayout
-    syntax keyword jsCssStyles      contained margin marginBottom marginLeft marginRight marginTop outline outlineColor outlineStyle outlineWidth padding paddingBottom paddingLeft paddingRight paddingTop
-    syntax keyword jsCssStyles      contained listStyle listStyleImage listStylePosition listStyleType
-    syntax keyword jsCssStyles      contained background backgroundAttachment backgroundColor backgroundImage gackgroundPosition backgroundPositionX backgroundPositionY backgroundRepeat
-    syntax keyword jsCssStyles      contained clear clip clipBottom clipLeft clipRight clipTop content counterIncrement counterReset cssFloat cursor direction display filter layoutGrid layoutGridChar layoutGridLine layoutGridMode layoutGridType
-    syntax keyword jsCssStyles      contained marks maxHeight maxWidth minHeight minWidth opacity MozOpacity overflow overflowX overflowY verticalAlign visibility zoom cssText
-    syntax keyword jsCssStyles      contained scrollbar3dLightColor scrollbarArrowColor scrollbarBaseColor scrollbarDarkShadowColor scrollbarFaceColor scrollbarHighlightColor scrollbarShadowColor scrollbarTrackColor
-
-    " Highlight ways
-    syntax match jsDotNotation      "\." nextgroup=jsPrototype,jsDomElemAttrs,jsDomElemFuncs,jsHtmlElemAttrs,jsHtmlElemFuncs
-    syntax match jsDotNotation      "\.style\." nextgroup=jsCssStyles
-
-endif "DOM/HTML/CSS
-
-"" end DOM/HTML/CSS specified things
-
-
-"" Code blocks
-syntax cluster jsExpression contains=jsComment,jsLineComment,jsDocComment,jsTemplateString,jsStringD,jsStringS,jsRegexpString,jsNumber,jsFloat,jsThis,jsOperator,jsBooleanTrue,jsBooleanFalse,jsNull,jsFunction,jsArrowFunction,jsGlobalObjects,jsExceptions,jsFutureKeys,jsDomErrNo,jsDomNodeConsts,jsHtmlEvents,jsDotNotation,jsBracket,jsParen,jsBlock,jsFuncCall,jsUndefined,jsNan,jsKeyword,jsStorageClass,jsPrototype,jsBuiltins,jsNoise,jsCommonJS
-syntax cluster jsAll        contains=@jsExpression,jsLabel,jsConditional,jsRepeat,jsReturn,jsStatement,jsTernaryIf,jsException
-syntax region  jsBracket    matchgroup=jsBrackets     start="\[" end="\]" contains=@jsAll,jsParensErrB,jsParensErrC,jsBracket,jsParen,jsBlock,@htmlPreproc fold
-syntax region  jsParen      matchgroup=jsParens       start="("  end=")"  contains=@jsAll,jsParensErrA,jsParensErrC,jsParen,jsBracket,jsBlock,@htmlPreproc fold
-syntax region  jsBlock      matchgroup=jsBraces       start="{"  end="}"  contains=@jsAll,jsParensErrA,jsParensErrB,jsParen,jsBracket,jsBlock,jsObjectKey,@htmlPreproc fold
-syntax region  jsFuncBlock  matchgroup=jsFuncBraces   start="{"  end="}"  contains=@jsAll,jsParensErrA,jsParensErrB,jsParen,jsBracket,jsBlock,@htmlPreproc contained fold
-syntax region  jsTernaryIf  matchgroup=jsTernaryIfOperator start=+?+  end=+:+  contains=@jsExpression,jsTernaryIf
-
-"" catch errors caused by wrong parenthesis
-syntax match   jsParensError    ")\|}\|\]"
-syntax match   jsParensErrA     contained "\]"
-syntax match   jsParensErrB     contained ")"
-syntax match   jsParensErrC     contained "}"
-
-if main_syntax == "javascript"
-  syntax sync clear
-  syntax sync ccomment jsComment minlines=200
-  syntax sync match jsHighlight grouphere jsBlock /{/
-endif
-
-exe 'syntax match jsFunction /\<function\>/ nextgroup=jsFuncName,jsFuncArgs skipwhite '.(exists('g:javascript_conceal_function') ? 'conceal cchar='.g:javascript_conceal_function : '')
-
-syntax match   jsFuncName       contained /\<[a-zA-Z_$][0-9a-zA-Z_$]*/ nextgroup=jsFuncArgs skipwhite
-syntax region  jsFuncArgs       contained matchgroup=jsFuncParens start='(' end=')' contains=jsFuncArgCommas,jsFuncArgRest nextgroup=jsFuncBlock keepend skipwhite skipempty
-syntax match   jsFuncArgCommas  contained ','
-syntax match   jsFuncArgRest    contained /\%(\.\.\.[a-zA-Z_$][0-9a-zA-Z_$]*\))/
-syntax keyword jsArgsObj        arguments contained containedin=jsFuncBlock
-
-syntax match jsArrowFunction /=>/
-
-" Define the default highlighting.
-" For version 5.7 and earlier: only when not done already
-" For version 5.8 and later: only when an item doesn't have highlighting yet
-if version >= 508 || !exists("did_javascript_syn_inits")
-  if version < 508
-    let did_javascript_syn_inits = 1
-    command -nargs=+ HiLink hi link <args>
+  " the containing paren, bracket, or curly. Many hacks for performance
+  call cursor(v:lnum,1)
+  let idx = index([']',')','}'],l:line[0])
+  if b:js_cache[0] > l:lnum && b:js_cache[0] < v:lnum ||
+        \ b:js_cache[0] == l:lnum && s:Balanced(l:lnum)
+    call call('cursor',b:js_cache[1:])
   else
-    command -nargs=+ HiLink hi def link <args>
+    let [s:looksyn, s:top_col, s:check_in, s:l1] = [v:lnum - 1,0,0,
+          \ max([s:l1, &smc ? search('\m^.\{'.&smc.',}','nbW',s:l1 + 1) + 1 : 0])]
+    try
+      if idx != -1
+        call s:GetPair(['\[','(','{'][idx],'])}'[idx],'bW','s:SkipFunc()')
+      elseif getline(v:lnum) !~ '^\S' && s:stack[-1] =~? 'block\|^jsobject$'
+        call s:GetPair('{','}','bW','s:SkipFunc()')
+      else
+        call s:AlternatePair()
+      endif
+    catch /^\Cout of bounds$/
+      call cursor(v:lnum,1)
+    endtry
+    let b:js_cache[1:] = line('.') == v:lnum ? [0,0] : getpos('.')[1:2]
   endif
-  HiLink jsFuncArgRest          Special
-  HiLink jsComment              Comment
-  HiLink jsLineComment          Comment
-  HiLink jsEnvComment           PreProc
-  HiLink jsDocComment           Comment
-  HiLink jsCommentTodo          Todo
-  HiLink jsCvsTag               Function
-  HiLink jsDocTags              Special
-  HiLink jsDocSeeTag            Function
-  HiLink jsDocType              Type
-  HiLink jsDocTypeNoParam       Type
-  HiLink jsDocParam             Label
-  HiLink jsStringS              String
-  HiLink jsStringD              String
-  HiLink jsTemplateString       String
-  HiLink jsTernaryIfOperator    Conditional
-  HiLink jsRegexpString         String
-  HiLink jsRegexpBoundary       SpecialChar
-  HiLink jsRegexpQuantifier     SpecialChar
-  HiLink jsRegexpOr             Conditional
-  HiLink jsRegexpMod            SpecialChar
-  HiLink jsRegexpBackRef        SpecialChar
-  HiLink jsRegexpGroup          jsRegexpString
-  HiLink jsRegexpCharClass      Character
-  HiLink jsCharacter            Character
-  HiLink jsPrototype            Special
-  HiLink jsConditional          Conditional
-  HiLink jsBranch               Conditional
-  HiLink jsLabel                Label
-  HiLink jsReturn               Statement
-  HiLink jsRepeat               Repeat
-  HiLink jsStatement            Statement
-  HiLink jsException            Exception
-  HiLink jsKeyword              Keyword
-  HiLink jsArrowFunction        Type
-  HiLink jsFunction             Type
-  HiLink jsFuncName             Function
-  HiLink jsArgsObj              Special
-  HiLink jsError                Error
-  HiLink jsParensError          Error
-  HiLink jsParensErrA           Error
-  HiLink jsParensErrB           Error
-  HiLink jsParensErrC           Error
-  HiLink jsOperator             Operator
-  HiLink jsStorageClass         StorageClass
-  HiLink jsThis                 Special
-  HiLink jsNan                  Number
-  HiLink jsNull                 Type
-  HiLink jsUndefined            Type
-  HiLink jsNumber               Number
-  HiLink jsFloat                Float
-  HiLink jsBooleanTrue          Boolean
-  HiLink jsBooleanFalse         Boolean
-  HiLink jsNoise                Noise
-  HiLink jsBrackets             Noise
-  HiLink jsParens               Noise
-  HiLink jsBraces               Noise
-  HiLink jsFuncBraces           Noise
-  HiLink jsFuncParens           Noise
-  HiLink jsSpecial              Special
-  HiLink jsTemplateVar          Special
-  HiLink jsGlobalObjects        Special
-  HiLink jsExceptions           Special
-  HiLink jsFutureKeys           Special
-  HiLink jsBuiltins             Special
-  HiLink jsCommonJS             Include
 
-  HiLink jsDomErrNo             Constant
-  HiLink jsDomNodeConsts        Constant
-  HiLink jsDomElemAttrs         Label
-  HiLink jsDomElemFuncs         PreProc
+  let [b:js_cache[0], num] = [v:lnum, b:js_cache[1]]
 
-  HiLink jsHtmlEvents           Special
-  HiLink jsHtmlElemAttrs        Label
-  HiLink jsHtmlElemFuncs        PreProc
+  let [num_ind, is_op, b_l, l:switch_offset] = [s:Nat(indent(num)),0,0,0]
+  if !num || s:LookingAt() == '{' && s:IsBlock()
+    let ilnum = line('.')
+    if num && s:LookingAt() == ')' && s:GetPair('(',')','bW',s:skip_expr)
+      if ilnum == num
+        let [num, num_ind] = [line('.'), indent('.')]
+      endif
+      if idx == -1 && s:PreviousToken() ==# 'switch' && s:IsSwitch()
+        let l:switch_offset = &cino !~ ':' ? s:sw() : s:ParseCino(':')
+        if pline[-1:] != '.' && l:line =~# '^\%(default\|case\)\>'
+          return s:Nat(num_ind + l:switch_offset)
+        elseif &cino =~ '='
+          let l:case_offset = s:ParseCino('=')
+        endif
+      endif
+    endif
+    if idx == -1 && pline[-1:] !~ '[{;]'
+      let sol = matchstr(l:line,s:opfirst)
+      if sol is '' || sol == '/' && s:SynAt(v:lnum,
+            \ 1 + len(getline(v:lnum)) - len(l:line)) =~? 'regex'
+        if s:Continues(l:lnum,pline)
+          let is_op = s:sw()
+        endif
+      elseif num && sol =~# '^\%(in\%(stanceof\)\=\|\*\)$'
+        call call('cursor',b:js_cache[1:])
+        if s:PreviousToken() =~ '\k' && s:Class()
+          return num_ind + s:sw()
+        endif
+        let is_op = s:sw()
+      else
+        let is_op = s:sw()
+      endif
+      call cursor(l:lnum, len(pline))
+      let b_l = s:Nat(s:IsContOne(b:js_cache[1],is_op) - (!is_op && l:line =~ '^{')) * s:sw()
+    endif
+  elseif idx.s:LookingAt().&cino =~ '^-1(.*(' && (search('\m\S','nbW',num) || s:ParseCino('U'))
+    let pval = s:ParseCino('(')
+    if !pval
+      let [Wval, vcol] = [s:ParseCino('W'), virtcol('.')]
+      if search('\m\S','W',num)
+        return s:ParseCino('w') ? vcol : virtcol('.')-1
+      endif
+      return Wval ? s:Nat(num_ind + Wval) : vcol
+    endif
+    return s:Nat(num_ind + pval + searchpair('\m(','','\m)','nbrmW',s:skip_expr,num) * s:sw())
+  endif
 
-  HiLink jsCssStyles            Label
+  " main return
+  if l:line =~ '^[])}]\|^|}'
+    if l:line_raw[0] == ')' && getline(num)[b:js_cache[2]-1] == '('
+      if s:ParseCino('M')
+        return indent(l:lnum)
+      elseif &cino =~# 'm' && !s:ParseCino('m')
+        return virtcol('.') - 1
+      endif
+    endif
+    return num_ind
+  elseif num
+    return s:Nat(num_ind + get(l:,'case_offset',s:sw()) + l:switch_offset + b_l + is_op)
+  endif
+  return b_l + is_op
+endfunction
 
-  delcommand HiLink
-endif
-
-" Define the htmlJavaScript for HTML syntax html.vim
-"syntax clear htmlJavaScript
-"syntax clear jsExpression
-syntax cluster  htmlJavaScript       contains=@jsAll,jsBracket,jsParen,jsBlock
-syntax cluster  javaScriptExpression contains=@jsAll,jsBracket,jsParen,jsBlock,@htmlPreproc
-" Vim's default html.vim highlights all javascript as 'Special'
-hi! def link javaScript              NONE
-
-let b:current_syntax = "javascript"
-if main_syntax == 'javascript'
-  unlet main_syntax
-endif
+let &cpo = s:cpo_save
+unlet s:cpo_save
