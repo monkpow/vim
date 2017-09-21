@@ -94,8 +94,8 @@ endfunction
 
 "colo github
 "colo 256_automation
-"colo lucius
-"LuciusDark " (dark default)
+colo lucius
+LuciusDark " (dark default)
 "LuciusDarkHighContrast
 "LuciusDarkLowContrast
 "LuciusBlack
@@ -130,7 +130,7 @@ highlight ExtraWhitespace ctermbg=red guibg=red
 highlight MissingWhitespace ctermbg=red guibg=red
 highlight HashRocketNO ctermbg=red
 autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
-autocmd Syntax * syn match HashRocketNO /=>/
+" autocmd Syntax * syn match HashRocketNO /=>/
 
 " highlight lines longer than 120 chars
 highlight OverLength ctermbg=darkblue ctermfg=white guibg=#FFD9D9
@@ -147,7 +147,15 @@ imap <left> <nop>
 imap <right> <nop>
 
 " syntastic!
-let g:syntastic_javascript_checkers = ['jscs', 'jshint', 'jscs']
+" set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_javascript_checkers = ['jscs', 'jshint']
 let g:syntastic_aggregate_errors = 1
 let g:syntastic_css_checkers = ['csslint']
 
