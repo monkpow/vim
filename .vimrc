@@ -95,13 +95,13 @@ endfunction
 "colo github
 "colo 256_automation
 colo lucius
-LuciusDark " (dark default)
+"LuciusDark " (dark default)
 "LuciusDarkHighContrast
 "LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
-"LuciusLight "(light default)
+LuciusLight "(light default)
 "LuciusLightLowContrast
 "LuciusWhite
 "LuciusWhiteLowContrast
@@ -121,15 +121,15 @@ set backupskip=/tmp/*,/private/tmp/*"
 "store swap files in my tmp dir
 set dir=/tmp
 
-"disable jslint line highlighting, because it is annoying me
-let g:JSLintHighlightErrorLine = 0
 
 " Attempt to highlight extra whitespace and bad formatting
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 highlight ExtraWhitespace ctermbg=red guibg=red
 highlight MissingWhitespace ctermbg=red guibg=red
 highlight HashRocketNO ctermbg=red
+highlight TWIG ctermbg=red guibg=red
 autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
+match TWIG /{%\|%}/
 " autocmd Syntax * syn match HashRocketNO /=>/
 
 " highlight lines longer than 120 chars
@@ -148,16 +148,18 @@ imap <right> <nop>
 
 " syntastic!
 " set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_javascript_checkers = ['jscs', 'jshint']
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_css_checkers = ['csslint']
+"let g:syntastic_always_populate_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
+"let g:syntastic_check_on_open = 1
+"let g:syntastic_check_on_wq = 0
+"let g:syntastic_javascript_checkers = ['jscs', 'jshint']
+"let g:syntastic_aggregate_errors = 1
+"let g:syntastic_css_checkers = ['csslint']
+"disable jslint line highlighting, because it is annoying me
+"let g:JSLintHighlightErrorLine = 0
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""
