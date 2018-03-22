@@ -135,6 +135,7 @@ match TWIG /{%\|%}/
 " highlight lines longer than 120 chars
 highlight OverLength ctermbg=darkblue ctermfg=white guibg=#FFD9D9
 match OverLength /\%121v.*/
+hi Todo gui=bold guifg=Black guibg=Yellow ctermbg=214 ctermbg=232
 
 " disable arrow keys
 map <up> <nop>
