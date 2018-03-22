@@ -56,7 +56,7 @@ autocmd BufNewFile * silent! 0r ~/.vim/templates/%:e.tpl
 autocmd BufWritePre *.js :%s/\s\+$//e
 autocmd BufNewFile,BufRead *.scss             set ft=scss
 autocmd BufNewFile,BufRead *.less             set ft=less.css
-autocmd BufNewFile,BufRead *.json             set ft=javascript
+autocmd BufNewFile,BufRead *.json             set ft=json
 
 au Syntax css source ~/.vim/syntax/css.vim
 
@@ -155,7 +155,7 @@ imap <right> <nop>
 "let g:syntastic_auto_loc_list = 1
 "let g:syntastic_check_on_open = 1
 "let g:syntastic_check_on_wq = 0
-"let g:syntastic_javascript_checkers = ['jscs', 'jshint']
+let g:syntastic_javascript_checkers = ['jscs', 'jshint']
 "let g:syntastic_aggregate_errors = 1
 "let g:syntastic_css_checkers = ['csslint']
 "disable jslint line highlighting, because it is annoying me
