@@ -98,23 +98,21 @@ colo lucius
 "LuciusDark " (dark default)
 "LuciusDarkHighContrast
 "LuciusDarkLowContrast
-LuciusBlack
+"LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
-"LuciusLight "(light defaul)
-"LuciusLightLowContrast
+LuciusLight "(light defaul)
+LuciusLightLowContrast
 "LuciusWhite
 "LuciusWhiteLowContrast
-
-
 
 " over-ride fiddly bits of color schemes
 " fix terrible highlighting and folding colors
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 highlight Folded ctermbg=None ctermfg=Gray
 highlight StatusLine cterm=bold ctermbg=white ctermfg=black
-highlight Todo ctermfg=221 ctermbg=221 guifg=#875f00 guibg=#ffffaf
-highlight Error ctermbg=196 ctermfg=196 
+highlight Todo ctermfg=203 ctermbg=221 guifg=#875f00 guibg=#ffffaf
+highlight Error ctermbg=203 ctermfg=196 
 silent! ruby nil
 
 "http://tim.theenchanter.com/2008/07/crontab-temp-file-must-be-edited-in.html
