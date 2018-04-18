@@ -72,6 +72,8 @@ nmap ,3 :only
 nmap ,4 :ball
 nmap ,5 :set number!
 nmap ,d :NERDTreeToggle
+" insert date time
+nmap ,6 :put =strftime(\"%Y.%m.%d %k:%M\")o
 
 " Make tab indent work the way I like it
 vnoremap < <gv
@@ -79,6 +81,7 @@ vnoremap > >gv
 
 " cleanup whitespace at end of line
 :nnoremap <silent> ,7 :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab
+
 
 function! CleanJson()
   %s/\([{|}]\)/\r\1\r/g
