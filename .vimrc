@@ -18,8 +18,6 @@ set shell=bash
 set title                " change the terminal's title
 set visualbell           " don't beep
 set noerrorbells         " don't beep
-set sw=2 ts=2 sts=2 " shiftwidth, tabsize and softtabsize
-set expandtab
 set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 set t_Co=256 "enable 256 colors
 set wmh=0 "minimum window hieght
@@ -74,6 +72,7 @@ nmap ,5 :set number!
 nmap ,d :NERDTreeToggle
 " insert date time
 nmap ,6 :put =strftime(\"%Y.%m.%d %k:%M\")o
+nmap ,b :put ='	byebug'
 
 " Make tab indent work the way I like it
 vnoremap < <gv
@@ -99,23 +98,25 @@ endfunction
 "colo 256_automation
 colo lucius
 "LuciusDark " (dark default)
-"LuciusDarkHighContrast
+LuciusDarkHighContrast
 "LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
-LuciusLight "(light defaul)
-LuciusLightLowContrast
+"LuciusLight "(light defaul)
+"LuciusLightLowContrast
 "LuciusWhite
 "LuciusWhiteLowContrast
 
 " over-ride fiddly bits of color schemes
 " fix terrible highlighting and folding colors
+syn match MisSpelled "assessement"
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 highlight Folded ctermbg=None ctermfg=Gray
 highlight StatusLine cterm=bold ctermbg=white ctermfg=black
 highlight Todo ctermfg=203 ctermbg=221 guifg=#875f00 guibg=#ffffaf
 highlight Error ctermbg=203 ctermfg=196 
+highlight MisSpelled ctermbg=205 ctermfg=black
 silent! ruby nil
 
 "http://tim.theenchanter.com/2008/07/crontab-temp-file-must-be-edited-in.html
@@ -159,9 +160,11 @@ imap <right> <nop>
 "let g:syntastic_auto_loc_list = 1
 "let g:syntastic_check_on_open = 1
 "let g:syntastic_check_on_wq = 0
-let g:syntastic_javascript_checkers = ['jscs', 'jshint']
-let g:syntastic_aggregate_errors = 1
+let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_css_checkers = ['csslint']
+"let g:syntastic_ruby_checkers = ['rubocop']
+let g:syntastic_ruby_checkers = ['rubocop']
+let g:syntastic_aggregate_errors = 1
 "disable jslint line highlighting, because it is annoying me
 "let g:JSLintHighlightErrorLine = 0
 
