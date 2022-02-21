@@ -36,6 +36,9 @@ set statusline+=%*
 "set list
 set listchars=tab:>~,trail:~,extends:#,nbsp:~
 
+" rehome ack since i put it in /.bin instead of /bin
+let g:ackprg = "~/.bin/ack -s -H --nocolor --nogroup --column"
+
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
 set wildmenu
