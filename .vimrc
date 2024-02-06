@@ -39,6 +39,11 @@ set listchars=tab:>~,trail:~,extends:#,nbsp:~
 " rehome ack since i put it in /.bin instead of /bin
 let g:ackprg = "~/.bin/ack -s -H --nocolor --nogroup --column"
 
+" use older node version for copilot (until support for 18 is permitted
+let g:copilot_node_command = "~/.nvm/versions/node/v16.20.2/bin/node"
+
+let g:coc_global_extensions = ['coc-tsserver']
+
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
 set wildmenu
@@ -58,6 +63,8 @@ autocmd BufWritePre *.js :%s/\s\+$//e
 autocmd BufNewFile,BufRead *.scss             set ft=scss
 autocmd BufNewFile,BufRead *.less             set ft=less.css
 autocmd BufNewFile,BufRead *.json             set ft=json
+" set filetypes as typescriptreact
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
 
 au Syntax css source ~/.vim/syntax/css.vim
 
@@ -101,13 +108,13 @@ endfunction
 "colo 256_automation
 colo lucius
 "LuciusDark " (dark default)
-LuciusDarkHighContrast
+"LuciusDarkHighContrast
 "LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
 "LuciusLight "(light defaul)
-"LuciusLightLowContrast
+LuciusLightLowContrast
 "LuciusWhite
 "LuciusWhiteLowContrast
 
