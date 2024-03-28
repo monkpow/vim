@@ -25,12 +25,13 @@ set wmh=0 "minimum window hieght
 "status line stuff
 set laststatus=2 " shows the statusbar, ruler, etc.
 set statusline=
+set statusline+=%* 
 set statusline+=%f\ " file name
 set statusline+=%= " right align
 set statusline+=%-14.(%l,%c%V%)\ %<%P " offset
 set statusline+=%h%1*%m%r%w%0* " flags
 set statusline+=%#warningmsg#
-set statusline+=%*
+set statusline+=%{coc#status()}
 
 " highlight unwanted whitespace
 "set list
@@ -41,8 +42,58 @@ let g:ackprg = "~/.bin/ack -s -H --nocolor --nogroup --column"
 
 " use older node version for copilot (until support for 18 is permitted
 let g:copilot_node_command = "~/.nvm/versions/node/v16.20.2/bin/node"
+let g:copilot_disable = 1
 
 let g:coc_global_extensions = ['coc-tsserver']
+
+
+" turn on the syntax checker
+syntax on
+let g:ale_completion_enabled = 0
+" don't check syntax immediately on open or on quit
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_save = 1
+let g:ale_linters = {'typescript': ['eslint'] }
+let g:ale_fixers = {'typescript': ['eslint', 'prettier'] }
+let g:ale_sign_column_always = 0
+"let g:ale_typescript_eslint_options = '-c ~/.eslintrc.apollo.js'
+"
+"ALE provides an omni-completion function you can use for triggering completion manually with <C-x><C-o>
+"let omnifunc=ale#completion#OmniFunc
+
+" By default, ALE displays errors and warnings with virtual text. The problems
+" ALE shows appear with comment-like syntax after every problem found. You can
+" set ALE to only show problems where the cursor currently lies like so.
+let g:ale_virtualtext_cursor = 'current'
+
+" error symbol to use in sidebar
+let g:ale_sign_error = '!'
+let g:ale_sign_warning = '?'
+" format error strings
+let g:ale_echo_msg_error_str = 'Error'
+let g:ale_echo_msg_warning_str = 'Warning'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+
+" Some ALE colors in the highlight blocks below
+" show number of errors
+function! LinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
+    let l:all_errors = l:counts.error + l:counts.style_error
+    let l:all_non_errors = l:counts.total - l:all_errors
+    return l:counts.total == 0 ? 'OK' : printf(
+        \   '%d⨉ %d⚠ ',
+        \   all_non_errors,
+        \   all_errors
+        \)
+endfunction
+set statusline+=%=
+set statusline+=\ %{LinterStatus()}
+
+
+
+
+
+
 
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
@@ -113,21 +164,36 @@ colo lucius
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
-"LuciusLight "(light defaul)
-LuciusLightLowContrast
+LuciusLight "(light defaul)
+"LuciusLightLowContrast
 "LuciusWhite
 "LuciusWhiteLowContrast
 
 " over-ride fiddly bits of color schemes
 " fix terrible highlighting and folding colors
-syn match MisSpelled "assessement"
+syn match MisSpelled "const"
 highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 highlight Folded ctermbg=None ctermfg=Gray
 highlight StatusLine cterm=bold ctermbg=white ctermfg=black
 highlight Todo ctermfg=203 ctermbg=221 guifg=#875f00 guibg=#ffffaf
 highlight Error ctermbg=203 ctermfg=196 
 highlight MisSpelled ctermbg=205 ctermfg=black
-silent! ruby nil
+highlight LineNr ctermfg=239 ctermbg=236
+highlight ALEErrorSign  ctermfg=2 ctermbg=236 
+highlight ALEWarningSign  ctermfg=2 ctermbg=236
+highlight ALESignColumnWithErrors cterm=bold ctermfg=0
+highlight ALESignColumnWithoutErrors cterm=bold ctermfg=0 
+highlight SignColumn cterm=bold ctermfg=0 ctermbg=white
+" Attempt to highlight extra whitespace and bad formatting
+" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+highlight ExtraWhitespace ctermbg=red guibg=red
+highlight MissingWhitespace ctermbg=red guibg=red
+"highlight HashRocketNO ctermbg=red
+"highlight TWIG ctermbg=red guibg=red
+autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
+" match TWIG /{%\|%}/
+" autocmd Syntax * syn match HashRocketNO /=>/
+" silent! ruby nil
 
 "http://tim.theenchanter.com/2008/07/crontab-temp-file-must-be-edited-in.html
 "vim 7.1 has issues editing crontab without this setting
@@ -137,19 +203,10 @@ set backupskip=/tmp/*,/private/tmp/*"
 set dir=/tmp
 
 
-" Attempt to highlight extra whitespace and bad formatting
-" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
-highlight ExtraWhitespace ctermbg=red guibg=red
-highlight MissingWhitespace ctermbg=red guibg=red
-"highlight HashRocketNO ctermbg=red
-highlight TWIG ctermbg=red guibg=red
-autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
-match TWIG /{%\|%}/
-" autocmd Syntax * syn match HashRocketNO /=>/
 
 " highlight lines longer than 120 chars
-highlight OverLength ctermbg=darkblue ctermfg=white guibg=#FFD9D9
-match OverLength /\%121v.*/
+"highlight OverLength ctermbg=darkblue ctermfg=white guibg=#FFD9D9
+"match OverLength /\%121v.*/
 
 " disable arrow keys
 map <up> <nop>
@@ -170,11 +227,12 @@ imap <right> <nop>
 "let g:syntastic_auto_loc_list = 1
 "let g:syntastic_check_on_open = 1
 "let g:syntastic_check_on_wq = 0
-let g:syntastic_javascript_checkers = ['eslint']
-let g:syntastic_css_checkers = ['csslint']
+"let g:syntastic_javascript_eslint_exe='$(npm run lint)'
+"let g:syntastic_javascript_checkers = ['eslint']
+"let g:syntastic_css_checkers = ['csslint']
+""let g:syntastic_ruby_checkers = ['rubocop']
 "let g:syntastic_ruby_checkers = ['rubocop']
-let g:syntastic_ruby_checkers = ['rubocop']
-let g:syntastic_aggregate_errors = 1
+"let g:syntastic_aggregate_errors = 1
 "disable jslint line highlighting, because it is annoying me
 "let g:JSLintHighlightErrorLine = 0
 

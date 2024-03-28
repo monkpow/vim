@@ -1,0 +1,4 @@
+{
+  "tsserver.useLocalTsdk":true,
+  "diagnostic.displayByAle": true
+}
