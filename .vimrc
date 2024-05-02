@@ -49,7 +49,8 @@ let g:coc_global_extensions = ['coc-tsserver']
 
 " turn on the syntax checker
 syntax on
-let g:ale_completion_enabled = 0
+"let g:ale_completion_enabled = 0
+let g:ale_completion_enabled = 1
 " don't check syntax immediately on open or on quit
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_save = 1
@@ -133,7 +134,8 @@ nmap ,5 :set number!
 nmap ,d :NERDTreeToggle
 " insert date time
 nmap ,6 :put =strftime(\"%Y.%m.%d %k:%M\")o
-nmap ,b :put ='	byebug'
+nmap ,a :ALEDetail
+nmap ,e :ALEGoToDefinition
 
 " Make tab indent work the way I like it
 vnoremap < <gv
