@@ -91,9 +91,23 @@ set statusline+=%=
 set statusline+=\ %{LinterStatus()}
 
 
+" https://github.com/airblade/vim-gitgutter
+let g:gitgutter_sign_added = '+'
+let g:gitgutter_sign_modified = '>'
+let g:gitgutter_sign_removed = '-'
+let g:gitgutter_sign_removed_first_line = '^'
+let g:gitgutter_sign_modified_removed = '<'
+
+" you prefer a simpler look, I also recommend setting the background color
+" of the sign column to your general background color:
+let g:gitgutter_override_sign_column_highlight = 1
+highlight SignColumn guibg=bg
+highlight SignColumn ctermbg=bg
 
 
-
+" Jump between hunks
+nmap <Leader>gn <Plug>(GitGutterNextHunk)  " git next
+nmap <Leader>gp <Plug>(GitGutterPrevHunk)  " git previous
 
 
 " http://items.sjbach.com/319/configuring-vim-right
@@ -185,7 +199,7 @@ highlight ALEErrorSign  ctermfg=2 ctermbg=236
 highlight ALEWarningSign  ctermfg=2 ctermbg=236
 highlight ALESignColumnWithErrors cterm=bold ctermfg=0
 highlight ALESignColumnWithoutErrors cterm=bold ctermfg=0 
-highlight SignColumn cterm=bold ctermfg=0 ctermbg=white
+"highlight SignColumn cterm=bold ctermfg=0 ctermbg=white
 " Attempt to highlight extra whitespace and bad formatting
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 highlight ExtraWhitespace ctermbg=red guibg=red
