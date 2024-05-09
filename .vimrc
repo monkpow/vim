@@ -101,14 +101,21 @@ let g:gitgutter_sign_modified_removed = '<'
 " you prefer a simpler look, I also recommend setting the background color
 " of the sign column to your general background color:
 let g:gitgutter_override_sign_column_highlight = 1
-highlight SignColumn guibg=bg
-highlight SignColumn ctermbg=bg
+"highlight SignColumn guibg=bg
+"highlight SignColumn ctermbg=bg
+
+
+" Open vimagit pane
+nnoremap <leader>gs :Magit<CR>       " git status
+
 
 
 " Jump between hunks
 nmap <Leader>gn <Plug>(GitGutterNextHunk)  " git next
 nmap <Leader>gp <Plug>(GitGutterPrevHunk)  " git previous
 
+nmap <Leader>gi :!gh issue list -a @me --state open --repo mdg-private/cloud-router
+nmap <Leader>gp :!gh pr status --repo mdg-private/studio-ui
 
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
