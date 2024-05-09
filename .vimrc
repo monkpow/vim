@@ -116,6 +116,8 @@ nmap <Leader>gp <Plug>(GitGutterPrevHunk)  " git previous
 
 nmap <Leader>gi :!gh issue list -a @me --state open --repo mdg-private/cloud-router
 nmap <Leader>gp :!gh pr status --repo mdg-private/studio-ui
+nmap <Leader>go :!jira issue list --plain --columns key,assignee,status,summary --assignee nik.krimm@apollographql.com --jql 'sprint="ONB 01"'
+
 
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
