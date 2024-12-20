@@ -38,25 +38,29 @@ set statusline+=%{coc#status()}
 set listchars=tab:>~,trail:~,extends:#,nbsp:~
 
 " rehome ack since i put it in /.bin instead of /bin
-let g:ackprg = "~/.bin/ack -s -H --nocolor --nogroup --column"
+let g:ackprg = "~/bin/ack -s -H --nocolor --nogroup --column"
 
 " use older node version for copilot (until support for 18 is permitted
-let g:copilot_node_command = "~/.nvm/versions/node/v16.20.2/bin/node"
-let g:copilot_disable = 1
+"let g:copilot_node_command = "~/.nvm/versions/node/v16.20.2/bin/node"
+"let g:copilot_disable = 1
 
-let g:coc_global_extensions = ['coc-tsserver']
+let g:coc_global_extensions = ['coc-tsserver', 'coc-rust-analyzer']
 
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 " turn on the syntax checker
 syntax on
 "let g:ale_completion_enabled = 0
-let g:ale_completion_enabled = 1
+"let g:ale_completion_enabled = 1
 " don't check syntax immediately on open or on quit
-let g:ale_lint_on_enter = 0
-let g:ale_lint_on_save = 1
-let g:ale_linters = {'typescript': ['eslint'] }
-let g:ale_fixers = {'typescript': ['eslint', 'prettier'] }
-let g:ale_sign_column_always = 0
+"let g:ale_lint_on_enter = 0
+"let g:ale_lint_on_save = 1
+"let g:ale_linters = {'typescript': ['eslint'] }
+"let g:ale_fixers = {'typescript': ['eslint', 'prettier'] }
+"let g:ale_sign_column_always = 0
 "let g:ale_typescript_eslint_options = '-c ~/.eslintrc.apollo.js'
 "
 "ALE provides an omni-completion function you can use for triggering completion manually with <C-x><C-o>
@@ -111,10 +115,8 @@ nnoremap <leader>gs :Magit<CR>       " git status
 " Jump between hunks
 nmap <Leader>gn <Plug>(GitGutterNextHunk)  " git next
 nmap <Leader>gp <Plug>(GitGutterPrevHunk)  " git previous
-
-nmap <Leader>gi :!gh issue list -a @me --state open --repo mdg-private/cloud-router
 nmap <Leader>gp :!gh pr status --repo mdg-private/studio-ui
-nmap <Leader>go :!jira issue list --plain --columns key,assignee,status,summary --assignee nik.krimm@apollographql.com --jql 'sprint="ONB 01"'
+nmap <Leader>go :!issue-summary
 
 " http://items.sjbach.com/319/configuring-vim-right
 let mapleader=','
@@ -151,6 +153,7 @@ nmap ,2 w  " change windows
 nmap ,3 :only
 nmap ,4 :ball
 nmap ,5 :set number!
+nmap ,n :set number!
 nmap ,d :NERDTreeToggle
 " insert date time
 nmap ,6 :put =strftime(\"%Y.%m.%d %k:%M\")o
@@ -216,6 +219,9 @@ autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\t/
 " match TWIG /{%\|%}/
 " autocmd Syntax * syn match HashRocketNO /=>/
 " silent! ruby nil
+
+highlight CocInlayHint ctermbg=none ctermfg=43
+
 
 "http://tim.theenchanter.com/2008/07/crontab-temp-file-must-be-edited-in.html
 "vim 7.1 has issues editing crontab without this setting
