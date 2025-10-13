@@ -44,40 +44,107 @@ let g:ackprg = "~/bin/ack -s -H --nocolor --nogroup --column"
 "let g:copilot_node_command = "~/.nvm/versions/node/v16.20.2/bin/node"
 "let g:copilot_disable = 1
 
-let g:coc_global_extensions = ['coc-tsserver', 'coc-rust-analyzer']
+" ========================================
+" TypeScript Configuration Section
+" Clean setup with CoC + ALE
+" ========================================
 
+" CoC Configuration
+" ----------------
+" CoC handles TypeScript LSP and completion
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-rust-analyzer',
+  \ 'coc-json',
+  \ 'coc-prettier'
+  \ ]
+
+" CoC keybindings
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
-" turn on the syntax checker
-syntax on
-"let g:ale_completion_enabled = 0
-"let g:ale_completion_enabled = 1
-" don't check syntax immediately on open or on quit
-"let g:ale_lint_on_enter = 0
-"let g:ale_lint_on_save = 1
-"let g:ale_linters = {'typescript': ['eslint'] }
-"let g:ale_fixers = {'typescript': ['eslint', 'prettier'] }
-"let g:ale_sign_column_always = 0
-"let g:ale_typescript_eslint_options = '-c ~/.eslintrc.apollo.js'
-"
-"ALE provides an omni-completion function you can use for triggering completion manually with <C-x><C-o>
-"let omnifunc=ale#completion#OmniFunc
+" Use tab for trigger completion with characters ahead and navigate
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-" By default, ALE displays errors and warnings with virtual text. The problems
-" ALE shows appear with comment-like syntax after every problem found. You can
-" set ALE to only show problems where the cursor currently lies like so.
-let g:ale_virtualtext_cursor = 'current'
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
 
-" error symbol to use in sidebar
-let g:ale_sign_error = '!'
-let g:ale_sign_warning = '?'
-" format error strings
+" Make <CR> to accept selected completion item
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+" ALE Configuration  
+" ----------------
+" ALE handles linting and formatting (warnings only)
+let g:ale_completion_enabled = 0  " Disable ALE completion, use CoC instead
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 'normal'
+let g:ale_lint_on_insert_leave = 1
+
+" TypeScript/JavaScript linters and fixers
+let g:ale_linters = {
+  \ 'typescript': ['eslint', 'tsserver'],
+  \ 'typescriptreact': ['eslint', 'tsserver'],
+  \ 'javascript': ['eslint'],
+  \ 'javascriptreact': ['eslint'],
+  \ 'rust': ['cargo'],
+  \ }
+
+let g:ale_fixers = {
+  \ 'typescript': ['prettier', 'eslint'],
+  \ 'typescriptreact': ['prettier', 'eslint'],
+  \ 'javascript': ['prettier', 'eslint'],
+  \ 'javascriptreact': ['prettier', 'eslint'],
+  \ 'json': ['prettier'],
+  \ 'css': ['prettier'],
+  \ 'scss': ['prettier'],
+  \ 'html': ['prettier'],
+  \ 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines'],
+  \ }
+
+" Configure Prettier as warnings, not errors
+let g:ale_type_map = {
+  \ 'prettier': {'ES': 'WS', 'E': 'W'},
+  \ }
+
+" ALE signs and messages
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚠'
 let g:ale_echo_msg_error_str = 'Error'
 let g:ale_echo_msg_warning_str = 'Warning'
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+
+" Show virtual text only for current line
+let g:ale_virtualtext_cursor = 'current'
+
+" Prettier configuration
+let g:ale_javascript_prettier_use_local_config = 1
+let g:ale_typescript_prettier_use_local_config = 1
+
+" Fix files automatically on save (set to 1 to enable)
+let g:ale_fix_on_save = 0
+
+" Key bindings
+nmap <leader>af <Plug>(ale_fix)
+nmap <leader>ad <Plug>(ale_detail)
+nmap <leader>an <Plug>(ale_next_wrap)
+nmap <leader>ap <Plug>(ale_previous_wrap)
+
+" ========================================
+" End TypeScript Configuration
+" ========================================
+
+" turn on the syntax checker
+syntax on
+set completeopt=menu,menuone,preview,noselect,noinsert
 
 " Some ALE colors in the highlight blocks below
 " show number of errors
@@ -139,6 +206,7 @@ autocmd BufNewFile,BufRead *.less             set ft=less.css
 autocmd BufNewFile,BufRead *.json             set ft=json
 " set filetypes as typescriptreact
 autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
+autocmd VimEnter *.journal set filetype=journal
 
 au Syntax css source ~/.vim/syntax/css.vim
 
@@ -158,7 +226,8 @@ nmap ,d :NERDTreeToggle
 " insert date time
 nmap ,6 :put =strftime(\"%Y.%m.%d %k:%M\")o
 nmap ,a :ALEDetail
-nmap ,e :ALEGoToDefinition
+" Use CoC for go to definition instead of ALE
+" nmap ,e :ALEGoToDefinition  " Replaced by gd (CoC)
 
 " Make tab indent work the way I like it
 vnoremap < <gv
@@ -185,11 +254,11 @@ endfunction
 colo lucius
 "LuciusDark " (dark default)
 "LuciusDarkHighContrast
-"LuciusDarkLowContrast
+LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
-LuciusLight "(light defaul)
+"LuciusLight "(light defaul)
 "LuciusLightLowContrast
 "LuciusWhite
 "LuciusWhiteLowContrast

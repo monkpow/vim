@@ -1,7 +1,6 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =5
-let g:netrw_dirhist_1='/Users/monkpollo/.dotfiles/graphql-tools/gql-query/queries'
-let g:netrw_dirhist_2='/Users/monkpollo/.dotfiles/graphql-tools/gql-query'
-let g:netrw_dirhist_3='/Users/monkpollo/.dotfiles/graphql-tools/gql-query/contexts'
-let g:netrw_dirhist_4='/Users/monkpollo/src/rover/src/command/install'
-let g:netrw_dirhist_5='/Users/monkpollo/src/performance-subgraphs'
+let g:netrw_dirhist_cnt =4
+let g:netrw_dirhist_1='/Users/monkpollo/src/apollo-agent-client-prototype/packages/server/src'
+let g:netrw_dirhist_2='/Users/monkpollo/src/ag2-ag-ui/AG-UI-AG2/ag-ui-travel-frontend/src/lib'
+let g:netrw_dirhist_3='/Users/monkpollo/src/apollo-agent-client-prototype/packages/client'
+let g:netrw_dirhist_4='/Users/monkpollo/src/apollo-agent-client-prototype/packages/client/src'
