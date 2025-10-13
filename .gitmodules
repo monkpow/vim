@@ -16,3 +16,6 @@
 [submodule "pack/languages/start/rust.vim"]
 	path = pack/languages/start/rust.vim
 	url = https://github.com/rust-lang/rust.vim.git
+[submodule "pack/languages/start/typescript-vim"]
+	path = pack/languages/start/typescript-vim
+	url = https://github.com/leafgarland/typescript-vim.git
