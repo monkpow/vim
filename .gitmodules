@@ -13,3 +13,6 @@
 [submodule "pack/core/start/coc"]
   path = pack/core/start/coc
 	url = https://github.com/neoclide/coc.nvim.git
+[submodule "pack/languages/start/rust.vim"]
+	path = pack/languages/start/rust.vim
+	url = https://github.com/rust-lang/rust.vim.git
