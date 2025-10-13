@@ -19,3 +19,6 @@
 [submodule "pack/languages/start/typescript-vim"]
 	path = pack/languages/start/typescript-vim
 	url = https://github.com/leafgarland/typescript-vim.git
+[submodule "pack/tools/start/ack.vim"]
+	path = pack/tools/start/ack.vim
+	url = https://github.com/mileszs/ack.vim.git
