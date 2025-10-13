@@ -91,10 +91,10 @@ let g:ale_lint_on_insert_leave = 1
 
 " TypeScript/JavaScript linters and fixers
 let g:ale_linters = {
-  \ 'typescript': ['eslint', 'tsserver'],
-  \ 'typescriptreact': ['eslint', 'tsserver'],
-  \ 'javascript': ['eslint'],
-  \ 'javascriptreact': ['eslint'],
+  \ 'typescript': ['eslint', 'tsserver', 'prettier'],
+  \ 'typescriptreact': ['eslint', 'tsserver', 'prettier'],
+  \ 'javascript': ['eslint', 'prettier'],
+  \ 'javascriptreact': ['eslint', 'prettier'],
   \ 'rust': ['cargo'],
   \ }
 
