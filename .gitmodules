@@ -22,3 +22,6 @@
 [submodule "pack/tools/start/ack.vim"]
 	path = pack/tools/start/ack.vim
 	url = https://github.com/mileszs/ack.vim.git
+[submodule "pack/tools/start/copilot.vim"]
+	path = pack/tools/start/copilot.vim
+	url = https://github.com/github/copilot.vim.git
