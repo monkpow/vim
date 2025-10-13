@@ -1,0 +1,15 @@
+[submodule "pack/core/start/ale"]
+	path = pack/core/start/ale
+	url = git@github.com:dense-analysis/ale.git
+[submodule "pack/core/start/vim-fugitive"]
+	path = pack/core/start/vim-fugitive
+	url = git@github.com:tpope/vim-fugitive.git
+[submodule "pack/core/start/nerdcommenter"]
+	path = pack/core/start/nerdcommenter
+	url = git@github.com:preservim/nerdcommenter.git
+[submodule "pack/core/start/nerdtree"]
+	path = pack/core/start/nerdtree
+  url = https://github.com/preservim/nerdtree.git
+[submodule "pack/core/start/coc"]
+  path = pack/core/start/coc
+	url = https://github.com/neoclide/coc.nvim.git
