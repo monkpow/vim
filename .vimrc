@@ -91,10 +91,10 @@ let g:ale_lint_on_insert_leave = 1
 
 " TypeScript/JavaScript linters and fixers
 let g:ale_linters = {
-  \ 'typescript': ['eslint', 'tsserver', 'prettier'],
-  \ 'typescriptreact': ['eslint', 'tsserver', 'prettier'],
-  \ 'javascript': ['eslint', 'prettier'],
-  \ 'javascriptreact': ['eslint', 'prettier'],
+  \ 'typescript': ['tsserver', 'eslint'],
+  \ 'typescriptreact': ['tsserver', 'eslint'],
+  \ 'javascript': ['eslint'],
+  \ 'javascriptreact': ['eslint'],
   \ 'rust': ['cargo'],
   \ }
 
@@ -126,8 +126,8 @@ let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_virtualtext_cursor = 'current'
 
 " Prettier configuration
-let g:ale_javascript_prettier_use_local_config = 1
-let g:ale_typescript_prettier_use_local_config = 1
+let g:ale_javascript_prettier_use_local_config = 0
+let g:ale_typescript_prettier_use_local_config = 0
 
 " Fix files automatically on save (set to 1 to enable)
 let g:ale_fix_on_save = 0

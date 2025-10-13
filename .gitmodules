@@ -1,39 +1,39 @@
 [submodule "pack/core/start/ale"]
 	path = pack/core/start/ale
 	url = git@github.com:dense-analysis/ale.git
-[submodule "pack/core/start/vim-fugitive"]
-	path = pack/core/start/vim-fugitive
-	url = git@github.com:tpope/vim-fugitive.git
+[submodule "pack/core/start/coc.nvim"]
+	path = pack/core/start/coc.nvim
+	url = https://github.com/neoclide/coc.nvim
 [submodule "pack/core/start/nerdcommenter"]
 	path = pack/core/start/nerdcommenter
 	url = git@github.com:preservim/nerdcommenter.git
 [submodule "pack/core/start/nerdtree"]
 	path = pack/core/start/nerdtree
   url = https://github.com/preservim/nerdtree.git
+[submodule "pack/core/start/vim-fugitive"]
+	path = pack/core/start/vim-fugitive
+	url = git@github.com:tpope/vim-fugitive.git
+[submodule "pack/languages/start/graphql"]
+	path = pack/languages/start/graphql
+	url = https://github.com/jparise/vim-graphql
 [submodule "pack/languages/start/rust.vim"]
 	path = pack/languages/start/rust.vim
 	url = https://github.com/rust-lang/rust.vim.git
 [submodule "pack/languages/start/typescript-vim"]
 	path = pack/languages/start/typescript-vim
 	url = https://github.com/leafgarland/typescript-vim.git
+[submodule "pack/languages/start/vim-jsx-pretty"]
+	path = pack/languages/start/vim-jsx-pretty
+	url = https://github.com/MaxMEllon/vim-jsx-pretty
+[submodule "pack/languages/start/vim-javascript"]
+	path = pack/languages/start/vim-javascript
+	url = https://github.com/pangloss/vim-javascript
+[submodule "pack/languages/start/vim-jsx-typescript"]
+	path = pack/languages/start/vim-jsx-typescript
+	url = https://github.com/peitalin/vim-jsx-typescript
 [submodule "pack/tools/start/ack.vim"]
 	path = pack/tools/start/ack.vim
 	url = https://github.com/mileszs/ack.vim.git
 [submodule "pack/tools/start/copilot.vim"]
 	path = pack/tools/start/copilot.vim
 	url = https://github.com/github/copilot.vim.git
-[submodule "pack/pack/tools/languages/vim-jsx-pretty"]
-	path = pack/pack/tools/languages/vim-jsx-pretty
-	url = https://github.com/MaxMEllon/vim-jsx-pretty
-[submodule "pack/pack/tools/languages/vim-javascript"]
-	path = pack/pack/tools/languages/vim-javascript
-	url = https://github.com/pangloss/vim-javascript
-[submodule "pack/pack/tools/languages/vim-jsx-typescript"]
-	path = pack/pack/tools/languages/vim-jsx-typescript
-	url = https://github.com/peitalin/vim-jsx-typescript
-[submodule "pack/pack/tools/languages/graphql"]
-	path = pack/pack/tools/languages/graphql
-	url = https://github.com/jparise/vim-graphql
-[submodule "pack/core/start/coc.nvim"]
-	path = pack/core/start/coc.nvim
-	url = https://github.com/neoclide/coc.nvim
