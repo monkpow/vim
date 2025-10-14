@@ -65,6 +65,13 @@ nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
+" Copilot
+imap <C-w> <Plug>(copilot-accept-word)
+imap <C-l> <Plug>(copilot-accept-line)
+imap <C-j> <Plug>(copilot-next)
+imap <C-k> <Plug>(copilot-previous)
+
+
 " Use tab for trigger completion with characters ahead and navigate
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
@@ -79,6 +86,10 @@ endfunction
 
 " Make <CR> to accept selected completion item
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+
+" Use coc hover instead of man pages
+nnoremap <silent> K :call CocAction('doHover')<CR>
 
 " ALE Configuration  
 " ----------------
@@ -116,7 +127,11 @@ let g:ale_type_map = {
   \ }
 
 " ALE signs and messages
-let g:ale_sign_error = '✗'
+"let g:ale_sign_error = 'x'
+"let g:ale_sign_error = '✖'
+"let g:ale_sign_error = '◉'
+let g:ale_sign_error = '▪'   " small solid square
+"let g:ale_sign_error = '■'   " larger solid square
 let g:ale_sign_warning = '⚠'
 let g:ale_echo_msg_error_str = 'Error'
 let g:ale_echo_msg_warning_str = 'Warning'
@@ -130,7 +145,7 @@ let g:ale_javascript_prettier_use_local_config = 0
 let g:ale_typescript_prettier_use_local_config = 0
 
 " Fix files automatically on save (set to 1 to enable)
-let g:ale_fix_on_save = 0
+let g:ale_fix_on_save = 1
 
 " Key bindings
 nmap <leader>af <Plug>(ale_fix)
@@ -213,6 +228,7 @@ au Syntax css source ~/.vim/syntax/css.vim
 " easy edit vimrc
 nmap ,s :source ~/.vimrc
 nmap ,v :sp ~/.vimrc
+set number
 
 " window size
 nmap = +  " convenience for add one line to this split
@@ -252,9 +268,9 @@ endfunction
 "colo github
 "colo 256_automation
 colo lucius
-"LuciusDark " (dark default)
+LuciusDark " (dark default)
 "LuciusDarkHighContrast
-LuciusDarkLowContrast
+"LuciusDarkLowContrast
 "LuciusBlack
 "LuciusBlackHighContrast
 "LuciusBlackLowContrast
@@ -270,10 +286,14 @@ highlight Pmenu ctermbg=gray cterm=bold ctermfg=darkblue
 highlight Folded ctermbg=None ctermfg=Gray
 highlight StatusLine cterm=bold ctermbg=white ctermfg=black
 highlight Todo ctermfg=203 ctermbg=221 guifg=#875f00 guibg=#ffffaf
-highlight Error ctermbg=203 ctermfg=196 
+"highlight Error ctermbg=203 ctermfg=196 
 highlight MisSpelled ctermbg=205 ctermfg=black
-highlight LineNr ctermfg=239 ctermbg=236
-highlight ALEErrorSign  ctermfg=2 ctermbg=236 
+"highlight LineNr ctermfg=239 ctermbg=236
+highlight LineNr ctermfg=238 ctermbg=236
+"highlight SignColumn ctermbg=236 ctermfg=238
+highlight SignColumn ctermbg=235 ctermfg=237
+"highlight ALEErrorSign  ctermfg=2 ctermbg=236 
+highlight ALEErrorSign  ctermfg=1 ctermbg=236 
 highlight ALEWarningSign  ctermfg=2 ctermbg=236
 highlight ALESignColumnWithErrors cterm=bold ctermfg=0
 highlight ALESignColumnWithoutErrors cterm=bold ctermfg=0 
