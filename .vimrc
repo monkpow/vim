@@ -70,6 +70,8 @@ imap <C-w> <Plug>(copilot-accept-word)
 imap <C-l> <Plug>(copilot-accept-line)
 imap <C-j> <Plug>(copilot-next)
 imap <C-k> <Plug>(copilot-previous)
+imap <C-\> <Plug>(copilot-suggest)    " Manual trigger
+imap <C-]> <Plug>(copilot-dismiss)    " Dismiss suggestion
 
 
 " Use tab for trigger completion with characters ahead and navigate
@@ -110,14 +112,14 @@ let g:ale_linters = {
   \ }
 
 let g:ale_fixers = {
-  \ 'typescript': ['prettier', 'eslint'],
-  \ 'typescriptreact': ['prettier', 'eslint'],
-  \ 'javascript': ['prettier', 'eslint'],
-  \ 'javascriptreact': ['prettier', 'eslint'],
-  \ 'json': ['prettier'],
-  \ 'css': ['prettier'],
-  \ 'scss': ['prettier'],
-  \ 'html': ['prettier'],
+  \ 'typescript': ['eslint'],
+  \ 'typescriptreact': ['eslint'],
+  \ 'javascript': ['eslint'],
+  \ 'javascriptreact': ['eslint'],
+  "\ 'json': ['prettier'],
+  "\ 'css': ['prettier'],
+  "\ 'scss': ['prettier'],
+  "\ 'html': ['prettier'],
   \ 'rust': ['rustfmt', 'trim_whitespace', 'remove_trailing_lines'],
   \ }
 
@@ -228,6 +230,9 @@ au Syntax css source ~/.vim/syntax/css.vim
 " easy edit vimrc
 nmap ,s :source ~/.vimrc
 nmap ,v :sp ~/.vimrc
+
+" Auto-open reminder file on vim startup (only if no file specified)
+" autocmd VimEnter * if argc() == 0 | edit ~/.vim/reminder.txt | endif
 set number
 
 " window size
